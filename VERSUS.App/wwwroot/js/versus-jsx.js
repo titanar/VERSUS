@@ -18,7 +18,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-//import { fromEvent } from 'rxjs';
 var ExampleComponent =
 /*#__PURE__*/
 function (_React$Component) {
@@ -31,20 +30,29 @@ function (_React$Component) {
   }
 
   _createClass(ExampleComponent, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      rxjs.fromEvent(this.refs.click, "click").subscribe(function (x) {
-        return console.log(x);
-      });
-    }
-  }, {
     key: "render",
     value: function render() {
       return React.createElement("div", {
         className: "testDiv"
-      }, React.createElement("h1", null, this.props.siteViewModel.announcement), React.createElement("a", {
+      }, React.createElement("h1", {
+        ref: "heading"
+      }, this.props.announcement), React.createElement("a", {
         ref: "click"
-      }, "click works only once"));
+      }, "click me"));
+    }
+  }, {
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var _this = this;
+
+      var clicked = rxjs.fromEvent(this.refs.click, "click");
+      clicked.pipe(rxjs.operators.mergeMap(function (x) {
+        return _this.refs.heading.textContent = "clicked!";
+      })).pipe(rxjs.operators.mergeMap(function (x) {
+        return rxjs.ajax.ajax("/test");
+      })).subscribe(function (x) {
+        return console.log(x);
+      });
     }
   }]);
 
