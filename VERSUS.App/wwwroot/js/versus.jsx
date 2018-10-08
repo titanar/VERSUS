@@ -1,5 +1,3 @@
-﻿import { fromEvent } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
 
 class ExampleComponent extends React.Component {
 

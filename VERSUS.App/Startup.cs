@@ -82,8 +82,7 @@ namespace VERSUS.App
 					// add all the necessary JavaScript files here. This includes
 					// your components as well as all of their dependencies.
 					config
-						.SetLoadBabel(false)
-						.AddScriptWithoutTransform("~/js/versus-jsx.js")
+						.AddScript("~/js/versus.jsx")
 						;
 				});
 			}
