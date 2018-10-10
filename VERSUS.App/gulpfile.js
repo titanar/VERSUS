@@ -12,73 +12,75 @@ var gulp = require("gulp"),
 var JS_FOLDER = "wwwroot/js",
     CSS_FOLDER = "wwwroot/css";
 
-gulp.task("css", function () {
+var JSX_EXTENSION = ".jsx",
+    JS_EXTENSION = ".js",
+    CSS_EXTENSION = ".css";
 
+var CSS_DEVELOPMENT = "versus" + CSS_EXTENSION,
+    CSS_PRODUCTION = "versus.min" + CSS_EXTENSION,
+    JS_LIBRARIES = "versus.libs" + JS_EXTENSION,
+    JS_CUSTOMCODE = "versus" + JS_EXTENSION,
+    JSX_SERVERSIDE = "versus" + JSX_EXTENSION,
+    JS_PRODUCTION = "versus.min" + JS_EXTENSION;
+
+gulp.task("css", function () {
 
     return merge2(
                 gulp.src("node_modules/bootstrap/dist/css/bootstrap.css"),
                 gulp.src("wwwroot/dev/css/*.scss")
             )
             .pipe(sass())
-            .pipe(concat("versus.css"))
+            .pipe(concat(CSS_DEVELOPMENT))
             .pipe(gulp.dest(CSS_FOLDER))
-            .pipe(rename("versus.min.css"))
+            .pipe(rename(CSS_PRODUCTION))
             .pipe(cleanCSS())
             .pipe(gulp.dest(CSS_FOLDER));
 });
 
 gulp.task("js", function () {
 
-    // Rework bundling so that dependency libraries are first and only minified, then custom JS, then transpiled JSX
-
+    // Bundle server-side JSX files for development
+    var react = gulp.src("wwwroot/dev/js/*.jsx")
+                    .pipe(deletelines({
+                        filters: [
+                            "import {.*;"
+                        ]
+                    }))
+                    .pipe(concat(JSX_SERVERSIDE))
+                    .pipe(gulp.dest(JS_FOLDER));
 
     // Bundle JS libraries for development
     var libs = merge2(
-            // Ensure core JS files are used first
-            gulp.src(["node_modules/jquery/dist/jquery.slim.js",
-                      "node_modules/popper.js/dist/umd/popper.js",
-                      "node_modules/rxjs/bundles/rxjs.umd.js"
-            ]),
-            // Add in dependent JS files
-            gulp.src([
-                      "node_modules/bootstrap/dist/js/bootstrap.bundle.js"
-            ]))
-            .pipe(concat("versus-libs.js"))
-        .pipe(gulp.dest(JS_FOLDER)); 
+                // Ensure core JS files are used first
+                gulp.src(["node_modules/jquery/dist/jquery.slim.js",
+                          "node_modules/popper.js/dist/umd/popper.js",
+                          "node_modules/rxjs/bundles/rxjs.umd.js"
+                ]),
+                // Add in dependent JS files
+                gulp.src([
+                          "node_modules/bootstrap/dist/js/bootstrap.bundle.js"
+                ]))
+            .pipe(concat(JS_LIBRARIES))
+            .pipe(gulp.dest(JS_FOLDER)); 
 
-
-    // Bundle JSX files for development
-    var react = gulp.src("wwwroot/dev/js/*.jsx")
-        .pipe(deletelines({
-            filters: [
-                "import {.*;"
-            ]
-        }))
-        .pipe(concat("versus.jsx"))
-        .pipe(gulp.dest(JS_FOLDER));
-;
-
+    // Bundle custom JS with transformed JSX
     var js = merge2(
                 gulp.src(["wwwroot/dev/js/*.js"
                 ]),
-        react
-            .pipe(babel({
-                presets: [
-                    //"@babel/preset-env",
-                    "@babel/preset-react"
-                ]
-            }))
-                    
-                    
-                    
-             )
-            .pipe(concat("versus.js"))
+                react
+                    .pipe(babel({
+                        presets: [
+                            "@babel/preset-react"
+                        ]
+                    }))
+            )
+            .pipe(concat(JS_CUSTOMCODE))
             .pipe(gulp.dest(JS_FOLDER)); 
 
-    // Bundle JS and JSX files for production
+    // Bundle all files for production
     return merge2(libs, js)
-        .pipe(concat("versus.min.js"))
-        .pipe(terser())
-        .pipe(gulp.dest(JS_FOLDER));
+            .pipe(concat(JS_PRODUCTION))
+            .pipe(terser())
+            .pipe(gulp.dest(JS_FOLDER));
 });
 
