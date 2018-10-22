@@ -8,14 +8,18 @@ using System;
 using System.Collections.Generic;
 using KenticoCloud.Delivery;
 
-namespace VERSUS.App.Models
+namespace VERSUS.Kentico.Models
 {
-    public partial class SiteLogo
+    public partial class SiteSection
     {
-        public const string Codename = "site_logo";
-        public const string LogoCodename = "logo";
+        public const string Codename = "site_section";
+        public const string IconCodename = "icon";
+        public const string DescriptionCodename = "description";
+        public const string TitleCodename = "title";
 
-        public IEnumerable<Asset> Logo { get; set; }
+        public IEnumerable<Asset> Icon { get; set; }
+        public string Description { get; set; }
+        public string Title { get; set; }
         public ContentItemSystemAttributes System { get; set; }
     }
 }

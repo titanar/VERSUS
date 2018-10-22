@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using KenticoCloud.Delivery;
 
-namespace VERSUS.App.Models
+namespace VERSUS.Kentico.Models
 {
     public partial class Site
     {

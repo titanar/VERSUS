@@ -4,9 +4,9 @@ using System.Linq;
 
 using KenticoCloud.Delivery;
 
-using VERSUS.App.Models;
+using VERSUS.Kentico.Models;
 
-namespace VERSUS.App
+namespace VERSUS.Kentico
 {
 	public class VersusTypeProvider : ICodeFirstTypeProvider
 	{

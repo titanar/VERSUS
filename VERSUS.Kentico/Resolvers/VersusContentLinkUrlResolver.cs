@@ -1,6 +1,6 @@
 ﻿using KenticoCloud.Delivery;
 
-namespace VERSUS.App
+namespace VERSUS.Kentico
 {
 	public class VersusContentLinkUrlResolver : IContentLinkUrlResolver
 	{

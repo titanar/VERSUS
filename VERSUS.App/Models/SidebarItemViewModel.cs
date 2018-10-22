@@ -1,5 +1,8 @@
 ﻿using System.Linq;
+
 using KenticoCloud.Delivery;
+
+using VERSUS.Kentico.Models;
 
 namespace VERSUS.App.Models
 {

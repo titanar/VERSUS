@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 
 using VERSUS.App.Models;
+using VERSUS.Kentico.Models;
 
 namespace VERSUS.App.Controllers
 {
