@@ -18,14 +18,14 @@ using VERSUS.Kentico;
 
 namespace VERSUS.App
 {
-    public class Startup
+	public class Startup
 	{
 		private const string ErrorHandlingPath = "/Site/Error";
 
-        public IConfiguration Configuration { get; }
+		public IConfiguration Configuration { get; }
 
-        public Startup(IConfiguration configuration)
-        {
+		public Startup(IConfiguration configuration)
+		{
 			Configuration = configuration;
 		}
 
@@ -34,8 +34,8 @@ namespace VERSUS.App
 		public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
 			services.AddMemoryCache()
-			    .AddOptions()
-    			.Configure<CookiePolicyOptions>(options =>
+				.AddOptions()
+				.Configure<CookiePolicyOptions>(options =>
 			{
 				// This lambda determines whether user consent for non-essential cookies is needed for a given request
 				options.CheckConsentNeeded = context => true;
@@ -43,16 +43,16 @@ namespace VERSUS.App
 				options.HttpOnly = HttpOnlyPolicy.Always;
 				options.Secure = CookieSecurePolicy.SameAsRequest;
 			})
-                .AddKenticoDelivery(Configuration)
+				.AddKenticoDelivery(Configuration)
 
 
-            // Required ReactJS services
-                .AddHttpContextAccessor()
-			    .AddReact()
-                .AddJsEngineSwitcher(options => options.DefaultEngineName = ChakraCoreJsEngine.EngineName)
-                .AddChakraCore();
+			// Required ReactJS services
+				.AddHttpContextAccessor()
+				.AddReact()
+				.AddJsEngineSwitcher(options => options.DefaultEngineName = ChakraCoreJsEngine.EngineName)
+				.AddChakraCore();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
 			return services.BuildServiceProvider();
 		}
@@ -61,41 +61,41 @@ namespace VERSUS.App
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
 			app.UseHttpsRedirection()
-			    .UseStatusCodePagesWithReExecute(ErrorHandlingPath + "/{0}");
+				.UseStatusCodePagesWithReExecute(ErrorHandlingPath + "/{0}");
 
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
-            }
+			}
 			else
 			{
 				app.UseExceptionHandler(ErrorHandlingPath)
 				   .UseHsts();
 			}
 
-            app.UseMiddleware<ExceptionClearResponseMiddleware>();
+			app.UseMiddleware<ExceptionClearResponseMiddleware>();
 
-            // Initialise ReactJS.NET. Must be before static files.
-            app.UseReact(config =>
-            {
-                // If you want to use server-side rendering of React components,
-                // add all the necessary JavaScript files here. This includes
-                // your components as well as all of their dependencies.
-                config
-                    .SetReuseJavaScriptEngines(true)
-                    .SetLoadBabel(false)
-                    .SetLoadReact(false)
-                    .AddScriptWithoutTransform("/js/versus.js");
-            })
+			// Initialise ReactJS.NET. Must be before static files.
+			app.UseReact(config =>
+			{
+				// If you want to use server-side rendering of React components,
+				// add all the necessary JavaScript files here. This includes
+				// your components as well as all of their dependencies.
+				config
+					.SetReuseJavaScriptEngines(true)
+					.SetLoadBabel(false)
+					.SetLoadReact(false)
+					.AddScriptWithoutTransform("/js/versus.js");
+			})
 
-                .UseStaticFiles()
-			    .UseCookiePolicy()
+				.UseStaticFiles()
+				.UseCookiePolicy()
 
-			    .UseMvc(routes => MapRoutes(routes));
+				.UseMvc(routes => MapRoutes(routes));
 		}
 
-        // Map MVC routes
-        private static void MapRoutes(IRouteBuilder routes)
+		// Map MVC routes
+		private static void MapRoutes(IRouteBuilder routes)
 		{
 			routes.MapRoute(name: "error",
 							template: "Site/Error/{errorCode?}",
