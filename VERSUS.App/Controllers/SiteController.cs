@@ -28,6 +28,7 @@ namespace VERSUS.App.Controllers
 			return View(siteObservable);
 		}
 
+        [Route("Site/Error/{errorCode?}")]
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 		public IActionResult Error(int? errorCode = null)
 		{

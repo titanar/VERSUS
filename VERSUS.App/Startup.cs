@@ -97,10 +97,6 @@ namespace VERSUS.App
 		// Map MVC routes
 		private static void MapRoutes(IRouteBuilder routes)
 		{
-			routes.MapRoute(name: "error",
-							template: "Site/Error/{errorCode?}",
-							defaults: new { controller = "Site", action = "Error"});
-
 			routes.MapRoute(name: "default",
 							template: "/",
 							defaults: new { controller = "Site", action = "Index" });
