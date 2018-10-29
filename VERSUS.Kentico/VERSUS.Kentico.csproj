@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="KenticoCloud.Delivery.Rx" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0-preview3-35497" />
   </ItemGroup>
 
   <ItemGroup>

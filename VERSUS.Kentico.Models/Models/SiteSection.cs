@@ -18,7 +18,7 @@ namespace VERSUS.Kentico.Models
         public const string TitleCodename = "title";
 
         public IEnumerable<Asset> Icon { get; set; }
-        public string Description { get; set; }
+        public IRichTextContent Description { get; set; }
         public string Title { get; set; }
         public ContentItemSystemAttributes System { get; set; }
     }

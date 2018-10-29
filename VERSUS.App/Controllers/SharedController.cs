@@ -5,35 +5,28 @@ using KenticoCloud.Delivery.Rx;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using VERSUS.Core;
 
 namespace VERSUS.App.Controllers
 {
 	public class SharedController : Controller
 	{
-		private readonly IDeliveryClient deliveryClient;
-		private readonly IMemoryCache memoryCache;
+        private readonly IMemoryCache memoryCache;
 
-		public DeliveryObservableProxy DeliveryObservable => new DeliveryObservableProxy(deliveryClient);
+        private IDeliveryClient DeliveryClient { get; }
 
-		public SharedController(IDeliveryClient deliveryClient,
-								ICodeFirstTypeProvider codeFirstTypeProvider,
-								IContentLinkUrlResolver contentLinkUrlResolver,
-								IMemoryCache memoryCache)
+        protected DeliveryObservableProxy DeliveryObservable => new DeliveryObservableProxy(DeliveryClient);
+
+		public SharedController(IDeliveryClient deliveryClient, IMemoryCache memoryCache)
 		{
 			this.memoryCache = memoryCache;
 
 			// Use the memory cache for Delivery client
-			this.deliveryClient = memoryCache.GetOrCreate(CacheKeys.DeliveryClient, entry =>
+			DeliveryClient = memoryCache.GetOrCreate(VersusConstants.CACHE_DeliveryClient, entry =>
 			{
-				IDeliveryClient cachedDeliveryClient;
-
-				deliveryClient.CodeFirstModelProvider.TypeProvider = codeFirstTypeProvider;
-				deliveryClient.ContentLinkUrlResolver = contentLinkUrlResolver;
-				cachedDeliveryClient = deliveryClient;
-
 				entry.SlidingExpiration = TimeSpan.FromHours(1);
 
-				return cachedDeliveryClient;
+				return deliveryClient;
 			});
 		}
 	}

@@ -7,14 +7,14 @@ using KenticoCloud.Delivery;
 using VERSUS.Core;
 using VERSUS.Kentico.Models;
 
-namespace VERSUS.Kentico
+namespace VERSUS.Kentico.Providers
 {
 	public class VersusTypeProvider : ICodeFirstTypeProvider
 	{
         private static readonly HashSet<(Type, string)> codenames = new HashSet<(Type, string)>(
                                                                             AppDomain.CurrentDomain.GetAssemblies()
                                                                                 .SelectMany(a => a.GetTypes())
-                                                                                .Where(t => t.IsClass && t.Namespace == VersusGlobals.VERSUS_KENTICO_MODELS_NAMESPACE)
+                                                                                .Where(t => t.IsClass && t.Namespace == VersusConstants.VERSUS_KENTICO_MODELS_NAMESPACE)
                                                                                 .Select(t => (t, t.GetField("Codename").GetValue(null).ToString())));
 
         /// <summary>

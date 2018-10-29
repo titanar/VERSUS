@@ -1,75 +1,76 @@
 ﻿using System;
-
+using KenticoCloud.Delivery;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
-using JavaScriptEngineSwitcher.ChakraCore;
-using JavaScriptEngineSwitcher.Extensions.MsDependencyInjection;
+using Microsoft.Extensions.Options;
 using React.AspNet;
-
-using VERSUS.Infrastructure;
-using VERSUS.Kentico;
+using VERSUS.App.Resolvers;
+using VERSUS.Core;
+using VERSUS.Core.Extensions;
+using VERSUS.Infrastructure.Extensions;
+using VERSUS.Infrastructure.Middleware;
+using VERSUS.Kentico.Extensions;
 
 namespace VERSUS.App
 {
-	public class Startup
+    public class Startup
 	{
-		private const string ErrorHandlingPath = "/Site/Error";
-
 		public IConfiguration Configuration { get; }
+        public IHostingEnvironment Environment { get; }
 
-		public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
 		{
 			Configuration = configuration;
+            Environment = env;
 		}
-
 
 		// Add services to the container. This method is called by the runtime.
 		public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
-			services.AddMemoryCache()
-				.AddOptions()
-				.Configure<CookiePolicyOptions>(options =>
-			{
-				// This lambda determines whether user consent for non-essential cookies is needed for a given request
-				options.CheckConsentNeeded = context => true;
-				options.MinimumSameSitePolicy = SameSiteMode.None;
-				options.HttpOnly = HttpOnlyPolicy.Always;
-				options.Secure = CookieSecurePolicy.SameAsRequest;
-			})
-				.AddKenticoDelivery(Configuration)
+            services.AddOptions()
 
+                    .Configure<VersusOptions>(Configuration)
 
-			// Required ReactJS services
-				.AddHttpContextAccessor()
-				.AddReact()
-				.AddJsEngineSwitcher(options => options.DefaultEngineName = ChakraCoreJsEngine.EngineName)
-				.AddChakraCore();
+                    .AddDatabaseContext(Configuration, Environment)
 
-			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                    .AddMemoryCache()
+
+                    .Configure<CookiePolicyOptions>(Configuration)
+                    .PostConfigure<CookiePolicyOptions>(options =>
+                    {
+                        // This lambda determines whether user consent for non-essential cookies is needed for a given request
+                        options.CheckConsentNeeded = context => true;
+                    })
+
+                    .AddSingleton<IContentLinkUrlResolver>(_ => new VersusContentLinkUrlResolver())
+
+                    .AddKenticoDelivery(Configuration)
+
+                    .AddReactServices()			
+
+			        .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest);
 
 			return services.BuildServiceProvider();
 		}
 
 		// Configure the HTTP request pipeline. The order of these methods matters. This method is called by the runtime.
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+		public void Configure(IApplicationBuilder app, IOptions<VersusOptions> options)
 		{
 			app.UseHttpsRedirection()
-				.UseStatusCodePagesWithReExecute(ErrorHandlingPath + "/{0}");
+				.UseStatusCodePagesWithReExecute(options.Value.ErrorHandlingRoute + "/{0}");
 
-			if (env.IsDevelopment())
+			if (Environment.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
 			}
 			else
 			{
-				app.UseExceptionHandler(ErrorHandlingPath)
+				app.UseExceptionHandler(options.Value.ErrorHandlingRoute)
 				   .UseHsts();
 			}
 
@@ -78,9 +79,7 @@ namespace VERSUS.App
 			// Initialise ReactJS.NET. Must be before static files.
 			app.UseReact(config =>
 			{
-				// If you want to use server-side rendering of React components,
-				// add all the necessary JavaScript files here. This includes
-				// your components as well as all of their dependencies.
+				// Server-side rendering of React components. Babel and React are provided manually.
 				config
 					.SetReuseJavaScriptEngines(true)
 					.SetLoadBabel(false)
@@ -91,15 +90,7 @@ namespace VERSUS.App
 				.UseStaticFiles()
 				.UseCookiePolicy()
 
-				.UseMvc(routes => MapRoutes(routes));
-		}
-
-		// Map MVC routes
-		private static void MapRoutes(IRouteBuilder routes)
-		{
-			routes.MapRoute(name: "default",
-							template: "/",
-							defaults: new { controller = "Site", action = "Index" });
+				.UseMvc();
 		}
 	}
 }

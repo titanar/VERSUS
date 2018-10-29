@@ -22,7 +22,7 @@ namespace VERSUS.Kentico.Models
         public const string WearableGenderCodename = "wearable__gender";
 
         public IEnumerable<Asset> ListableMainImages { get; set; }
-        public string ListableDescription { get; set; }
+        public IRichTextContent ListableDescription { get; set; }
         public DateTime? ListableReleaseDate { get; set; }
         public decimal? WearableSize { get; set; }
         public IEnumerable<MultipleChoiceOption> Colors { get; set; }

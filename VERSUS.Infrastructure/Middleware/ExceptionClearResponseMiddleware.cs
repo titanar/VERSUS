@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace VERSUS.Infrastructure
+namespace VERSUS.Infrastructure.Middleware
 {
     public class ExceptionClearResponseMiddleware
     {

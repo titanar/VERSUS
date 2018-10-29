@@ -1,6 +1,6 @@
 ﻿namespace VERSUS.Core
 {
-	public static class VersusGlobals
+	public static partial class VersusConstants
 	{
 		public const string CACHE_DeliveryClient = "_DeliveryClient";
 
