@@ -7,10 +7,10 @@ namespace VERSUS.Kentico.Areas.WebHooks.Models
 {
     public class WebhookNotificationEventArgs : EventArgs, IEquatable<WebhookNotificationEventArgs>
     {
-        public IdentifierSet IdentifierSet { get; }
+        public CacheIdentifierPair IdentifierSet { get; }
         public string Operation { get; }
 
-        public WebhookNotificationEventArgs(IdentifierSet identifierSet, string operation)
+        public WebhookNotificationEventArgs(CacheIdentifierPair identifierSet, string operation)
         {
             if (identifierSet != null && !string.IsNullOrEmpty(operation))
             {

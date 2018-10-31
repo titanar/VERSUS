@@ -10,7 +10,7 @@ namespace VERSUS.Kentico.Services
         /// <summary>
         /// Either fixed or floating period of time required for an entry to expire.
         /// </summary>
-        int CacheExpirySeconds { get; set; }
+        int CacheExpirySeconds { get; }
 
         /// <summary>
         /// Gets an existing cache entry or creates one using the supplied <paramref name="valueFactory"/>.
@@ -22,7 +22,7 @@ namespace VERSUS.Kentico.Services
         /// <param name="dependencyListFactory">Method to get a collection of identifiers of entries that the current entry depends upon.</param>
         /// <param name="createCacheEntriesInBackground">Flag saying if cache entry should be off-loaded to a background thread.</param>
         /// <returns>The cache entry value, either cached or obtained through the <paramref name="valueFactory"/>.</returns>
-        Task<T> GetOrCreateAsync<T>(IEnumerable<string> identifierTokens, Func<Task<T>> valueFactory, Func<T, bool> skipCacheDelegate, Func<T, IEnumerable<IdentifierSet>> dependencyListFactory, bool createCacheEntriesInBackground = true);
+        Task<T> GetOrCreateAsync<T>(IEnumerable<string> identifierTokens, Func<Task<T>> valueFactory, Func<T, bool> skipCacheDelegate, Func<T, IEnumerable<CacheIdentifierPair>> dependencyListFactory, bool createCacheEntriesInBackground = true);
 
         /// <summary>
         /// Tries to get a cache entry.
@@ -38,7 +38,7 @@ namespace VERSUS.Kentico.Services
         /// Invalidates (clears) a cache entry.
         /// </summary>
         /// <param name="identifiers">Identifiers of the entry.</param>
-        void InvalidateEntry(IdentifierSet identifiers);
+        void InvalidateEntry(CacheIdentifierPair identifiers);
 
         /// <summary>
         /// Looks up the cache for an entry and passes it to a method that extracts specific dependencies.
@@ -47,7 +47,7 @@ namespace VERSUS.Kentico.Services
         /// <param name="identifierSet">Identifiers used to look up the cache for the entry.</param>
         /// <param name="dependencyListFactory">The method that takes the entry, and uses them to extract dependencies from it.</param>
         /// <returns>Identifiers of the dependencies.</returns>
-        IEnumerable<IdentifierSet> GetDependenciesByName<T>(IdentifierSet identifierSet, Func<T, IEnumerable<IdentifierSet>> dependencyListFactory)
+        IEnumerable<CacheIdentifierPair> GetDependenciesFromCache<T>(CacheIdentifierPair identifierSet, Func<T, IEnumerable<CacheIdentifierPair>> dependencyListFactory)
             where T : class;
 
         /// <summary>
@@ -57,6 +57,6 @@ namespace VERSUS.Kentico.Services
         /// <param name="codename">The code name of the cache entry.</param>
         /// <param name="dependencyListFactory">The method that takes each of the identifiers of the dependent types (formats), and uses them to extract dependencies.</param>
         /// <returns>Identifiers of the dependencies.</returns>
-        IEnumerable<IdentifierSet> GetDependenciesByType(string originalTypeIdentifier, string codename, Func<IdentifierSet, IEnumerable<IdentifierSet>> dependencyListFactory);
+        IEnumerable<CacheIdentifierPair> GetDependentIdentifierPairs(string originalTypeIdentifier, string codename, Func<CacheIdentifierPair, IEnumerable<CacheIdentifierPair>> dependencyListFactory);
     }
 }

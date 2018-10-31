@@ -15,7 +15,10 @@ namespace VERSUS.Kentico.Filters
     {
         private readonly string _secret;
 
-        public KenticoCloudSignatureActionFilter(IOptions<VersusOptions> projectOptions) => _secret = projectOptions.Value.KenticoCloudWebhookSecret;
+        public KenticoCloudSignatureActionFilter(IOptions<VersusOptions> versusOptions)
+        {
+            _secret = versusOptions.Value.KenticoCloudWebhookSecret;
+        }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {

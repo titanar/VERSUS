@@ -19,7 +19,7 @@ namespace VERSUS.Kentico.Services
 {
     public class ReactiveCacheManager : ICacheManager
     {
-        #region "Fields"
+        #region Fields
 
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         private readonly IDependentTypesResolver _dependentTypesResolver;
@@ -31,15 +31,11 @@ namespace VERSUS.Kentico.Services
 
         #endregion
 
-        #region "Properties"
+        #region Properties
 
-        public int CacheExpirySeconds
-        {
-            get;
-            set;
-        }
+        public int CacheExpirySeconds { get; }
 
-        public IMemoryCache MemoryCache { get; }
+        IMemoryCache MemoryCache { get; }
 
         protected List<string> InvalidatingOperations => new List<string>
         {
@@ -53,20 +49,20 @@ namespace VERSUS.Kentico.Services
 
         #endregion
 
-        #region "Constructors"
+        #region Constructors
 
-        public ReactiveCacheManager(IOptions<VersusOptions> projectOptions, IMemoryCache memoryCache, IDependentTypesResolver relatedTypesResolver, IWebhookListener webhookListener)
+        public ReactiveCacheManager(IOptions<VersusOptions> options, IMemoryCache memoryCache, IDependentTypesResolver dependentTypesResolver, IWebhookListener webhookListener)
         {
-            CacheExpirySeconds = projectOptions?.Value?.CacheTimeoutSeconds ?? throw new ArgumentNullException(nameof(projectOptions));
-            MemoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
-            _dependentTypesResolver = relatedTypesResolver ?? throw new ArgumentNullException(nameof(relatedTypesResolver));
+            CacheExpirySeconds = options.Value.CacheTimeoutSeconds;
+            MemoryCache = memoryCache;
+            _dependentTypesResolver = dependentTypesResolver;
 
             WebhookObservableFactory
                 .GetObservable(webhookListener, nameof(webhookListener.WebhookNotification))
                 .Where(args => InvalidatingOperations.Any(operation => operation.Equals(args.Operation, StringComparison.Ordinal)))
                 .Throttle(TimeSpan.FromSeconds(1))
                 .DistinctUntilChanged()
-                .Subscribe((args) => InvalidateEntry(args.IdentifierSet));
+                .Subscribe(args => InvalidateEntry(args.IdentifierSet));
         }
 
         #endregion
@@ -80,36 +76,36 @@ namespace VERSUS.Kentico.Services
         /// <param name="identifierTokens">String tokens that form a unique identifier of the entry.</param>
         /// <param name="valueFactory">Method to create the entry.</param>
         /// <param name="skipCacheDelegate">Method to check whether a cache entry should be created (TRUE to skip creation of the entry).</param>
-        /// <param name="dependencyListFactory">Method to get a collection of identifiers of entries that the current entry depends upon.</param>
+        /// <param name="dependencyFactory">Method to get a collection of identifiers of entries that the current entry depends upon.</param>
         /// <param name="createCacheEntriesInBackground">Flag saying if cache entry should be off-loaded to a background thread.</param>
         /// <returns>The cache entry value, either cached or obtained through the <paramref name="valueFactory"/>.</returns>
-        public async Task<T> GetOrCreateAsync<T>(IEnumerable<string> identifierTokens, Func<Task<T>> valueFactory, Func<T, bool> skipCacheDelegate, Func<T, IEnumerable<IdentifierSet>> dependencyListFactory, bool createCacheEntriesInBackground = false)
+        public async Task<T> GetOrCreateAsync<T>(IEnumerable<string> identifierTokens, Func<Task<T>> valueFactory, Func<T, bool> skipCacheDelegate, Func<T, IEnumerable<CacheIdentifierPair>> dependencyFactory, bool createCacheEntriesInBackground = false)
         {
-            var joinedTokens = string.Join("|", identifierTokens);
             await _semaphoreSlim.WaitAsync();
 
             try
             {
-                // Check existence of the cache entry.
-                if (!MemoryCache.TryGetValue(joinedTokens, out T entry))
-                {
-                    // If it doesn't exist, get it via valueFactory.
-                    T response = await valueFactory();
+                var key = string.Join("|", identifierTokens);
 
-                    if (!skipCacheDelegate(response))
+                if (!MemoryCache.TryGetValue(key, out T entry))
+                {
+                    // If it doesn't exist, get it via valueFactory
+                    T value = await valueFactory();
+
+                    if (!skipCacheDelegate(value))
                     {
                         // Create it in a background thread.
                         if (createCacheEntriesInBackground)
                         {
-                            var task = Task.Run(() => CreateEntry(identifierTokens, response, dependencyListFactory));
+                            _ = Task.Run(() => CreateEntry(key, value, dependencyFactory));
                         }
                         else
                         {
-                            CreateEntry(identifierTokens, response, dependencyListFactory);
+                            CreateEntry(key, value, dependencyFactory);
                         }
                     }
 
-                    return response;
+                    return value;
                 }
 
                 return entry;
@@ -124,63 +120,46 @@ namespace VERSUS.Kentico.Services
         /// Creates a new cache entry.
         /// </summary>
         /// <typeparam name="T">Type of the cache entry value.</typeparam>
-        /// <param name="identifierTokens">String tokens that form a unique identifier of the entry.</param>
+        /// <param name="key">String tokens that form a unique identifier of the entry.</param>
         /// <param name="value">Value of the entry.</param>
-        /// <param name="dependencyListFactory">Method to get a collection of identifier of entries that the current entry depends upon.</param>
-        public void CreateEntry<T>(IEnumerable<string> identifierTokens, T value, Func<T, IEnumerable<IdentifierSet>> dependencyListFactory)
+        /// <param name="dependencyFactory">Method to get a collection of identifier of entries that the current entry depends upon.</param>
+        private void CreateEntry<T>(string key, T value, Func<T, IEnumerable<CacheIdentifierPair>> dependencyFactory)
         {
-            var dependencies = dependencyListFactory(value) ?? new List<IdentifierSet>();
+            var dependencies = dependencyFactory(value) ?? new List<CacheIdentifierPair>();
 
             // Restart entries' expiration period each time they're requested.
-            var entryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(CacheExpirySeconds));
-
-            // Dummy entries never expire.
-            var dummyOptions = new MemoryCacheEntryOptions().SetPriority(CacheItemPriority.NeverRemove);
+            var entryOptions = new MemoryCacheEntryOptions()
+            {
+                SlidingExpiration = TimeSpan.FromSeconds(CacheExpirySeconds)
+            };
 
             foreach (var dependency in dependencies)
             {
-                var dummyIdentifierTokens = new List<string> { KenticoCloudCacheHelper.DUMMY_IDENTIFIER, dependency.Type, dependency.Codename };
+                var dummyIdentifierTokens = new List<string> { KenticoCloudCacheHelper.DUMMY_IDENTIFIER, dependency.TypeName, dependency.Codename };
                 var dummyKey = string.Join("|", dummyIdentifierTokens);
                 var newDummyLock = new object();
-                object dummyPadlock;
+                object dummyLock;
 
                 if (_cacheDummyLocks.TryAdd(dummyKey, newDummyLock))
                 {
-                    dummyPadlock = newDummyLock;
+                    dummyLock = newDummyLock;
                 }
                 else
                 {
-                    dummyPadlock = _cacheDummyLocks[dummyKey];
+                    dummyLock = _cacheDummyLocks[dummyKey];
                 }
 
-                // Dummy entries hold just the CancellationTokenSource, nothing else.
-
+                // Dummy entries hold just the CancellationTokenSource
                 if (!DummyEntryExists(dummyKey, out CancellationTokenSource dummyEntry))
                 {
-                    lock (dummyPadlock)
+                    lock (dummyLock)
                     {
-                        dummyEntry = GetOrCreateDummyEntry(dummyOptions, dummyKey);
+                        dummyEntry = GetOrCreateDummyEntry(dummyKey);
                     }
                 }
 
-                if (dummyEntry != null)
-                {
-                    // Subscribe the main entry to dummy entry's cancellation token.
-                    entryOptions.AddExpirationToken(new CancellationChangeToken(dummyEntry.Token));
-                }
-            }
-
-            var key = string.Join("|", identifierTokens);
-            var newLock = new object();
-            object padlock;
-
-            if (_cacheLocks.TryAdd(key, newLock))
-            {
-                padlock = newLock;
-            }
-            else
-            {
-                padlock = _cacheLocks[key];
+                // Subscribe the main entry to dummy entry's cancellation token
+                entryOptions.AddExpirationToken(new CancellationChangeToken(dummyEntry.Token));
             }
 
             if (!EntryExists(key))
@@ -189,7 +168,7 @@ namespace VERSUS.Kentico.Services
                 {
                     if (!EntryExists(key))
                     {
-                        MemoryCache.Set(string.Join("|", identifierTokens), value, entryOptions);
+                        MemoryCache.Set(key, value, entryOptions);
                     }
                 }
             }
@@ -205,39 +184,23 @@ namespace VERSUS.Kentico.Services
         public bool TryGetValue<T>(IEnumerable<string> identifierTokens, out T value)
             where T : class
         {
-            if (MemoryCache.TryGetValue(string.Join("|", identifierTokens), out T entry))
-            {
-                value = entry;
-
-                return true;
-            }
-            else
-            {
-                value = null;
-
-                return false;
-            }
+            return MemoryCache.TryGetValue(string.Join("|", identifierTokens), out value);
         }
 
         /// <summary>
         /// Invalidates (clears) a cache entry.
         /// </summary>
-        /// <param name="identifiers">Identifiers of the entry.</param>
-        public void InvalidateEntry(IdentifierSet identifiers)
+        /// <param name="dependency">Identifiers of the entry.</param>
+        public void InvalidateEntry(CacheIdentifierPair dependency)
         {
-            if (_dependentTypesResolver == null)
+            if (dependency == null)
             {
-                throw new ArgumentNullException(nameof(_dependentTypesResolver));
+                throw new ArgumentNullException(nameof(dependency));
             }
 
-            if (identifiers == null)
+            foreach (var dependentTypeName in _dependentTypesResolver.GetDependentTypeNames(dependency.TypeName))
             {
-                throw new ArgumentNullException(nameof(identifiers));
-            }
-
-            foreach (var typeIdentifier in _dependentTypesResolver.GetDependentTypeNames(identifiers.Type))
-            {
-                if (MemoryCache.TryGetValue(string.Join("|", KenticoCloudCacheHelper.DUMMY_IDENTIFIER, typeIdentifier, identifiers.Codename), out CancellationTokenSource dummyEntry))
+                if (MemoryCache.TryGetValue(string.Join("|", KenticoCloudCacheHelper.DUMMY_IDENTIFIER, dependentTypeName, dependency.Codename), out CancellationTokenSource dummyEntry))
                 {
                     // Mark all subscribers to the CancellationTokenSource as invalid.
                     dummyEntry.Cancel();
@@ -246,45 +209,38 @@ namespace VERSUS.Kentico.Services
         }
 
         /// <summary>
-        /// Looks up the cache for an entry and passes it to a method that extracts specific dependencies.
+        /// Looks up the cache for an entry and passes it to <paramref name="dependencyFactory"/> that extracts specific dependencies.
         /// </summary>
         /// <typeparam name="T">Type of the cache entry.</typeparam>
-        /// <param name="identifierSet">Identifiers used to look up the cache for the entry.</param>
-        /// <param name="dependencyListFactory">The method that takes the entry, and uses them to extract dependencies from it.</param>
+        /// <param name="cacheIdentifierPair">Identifiers used to look up the cache for the entry.</param>
+        /// <param name="dependencyFactory">The method that takes the entry, and uses them to extract dependencies from it.</param>
         /// <returns>Identifiers of the dependencies.</returns>
-        public IEnumerable<IdentifierSet> GetDependenciesByName<T>(IdentifierSet identifierSet, Func<T, IEnumerable<IdentifierSet>> dependencyFactory)
+        public IEnumerable<CacheIdentifierPair> GetDependenciesFromCache<T>(CacheIdentifierPair cacheIdentifierPair, Func<T, IEnumerable<CacheIdentifierPair>> dependencyFactory)
             where T : class
         {
-            var dependencies = new List<IdentifierSet>();
-
-            if (TryGetValue(new[] { identifierSet.Type, identifierSet.Codename }, out T cacheEntry))
+            if (MemoryCache.TryGetValue(string.Join("|", cacheIdentifierPair.TypeName, cacheIdentifierPair.Codename ), out T cacheEntry))
             {
                 return dependencyFactory(cacheEntry);
             }
 
-            return dependencies;
+            return null;
         }
 
         /// <summary>
-        /// Prepares identifier sets for all dependent types (formats) of the cache entry and passes them onto <paramref name="dependencyFactory"/> to extract specific dependencies.
+        /// Gets dependent identifier pairs and passes them to <paramref name="dependencyFactory"/> that extracts specific dependencies.
         /// </summary>
-        /// <param name="originalTypeIdentifier">The original type of the cache entry.</param>
+        /// <param name="typeName">The original type of the cache entry.</param>
         /// <param name="codename">The code name of the cache entry.</param>
         /// <param name="dependencyListFactory">The method that takes each of the identifiers of the dependent types (formats), and uses them to extract dependencies.</param>
         /// <returns>Identifiers of the dependencies.</returns>
-        public IEnumerable<IdentifierSet> GetDependenciesByType(string originalTypeIdentifier, string codename, Func<IdentifierSet, IEnumerable<IdentifierSet>> dependencyFactory)
+        public IEnumerable<CacheIdentifierPair> GetDependentIdentifierPairs(string typeName, string codename, Func<CacheIdentifierPair, IEnumerable<CacheIdentifierPair>> dependencyFactory)
         {
-            var dependencies = new List<IdentifierSet>();
-
-            if (!string.IsNullOrEmpty(codename) && !string.IsNullOrEmpty(originalTypeIdentifier) && dependencyFactory != null)
+            foreach (var dependentTypeName in _dependentTypesResolver.GetDependentTypeNames(typeName))
             {
-                foreach (var typeIdentifier in _dependentTypesResolver.GetDependentTypeNames(originalTypeIdentifier))
-                {
-                    dependencies.AddNonNullRange(dependencyFactory(new IdentifierSet { Type = typeIdentifier, Codename = codename }));
-                }
+                return dependencyFactory(new CacheIdentifierPair { TypeName = dependentTypeName, Codename = codename });
             }
 
-            return dependencies;
+            return null;
         }
 
         /// <summary>
@@ -302,14 +258,14 @@ namespace VERSUS.Kentico.Services
 
         protected bool EntryExists(string key)
         {
-            return MemoryCache.TryGetValue(key, out object existingValue);
+            return MemoryCache.TryGetValue(key, out _);
         }
 
-        protected CancellationTokenSource GetOrCreateDummyEntry(MemoryCacheEntryOptions dummyOptions, string dummyKey)
+        protected CancellationTokenSource GetOrCreateDummyEntry(string dummyKey)
         {
             if (!DummyEntryExists(dummyKey, out CancellationTokenSource dummyEntry))
             {
-                dummyEntry = MemoryCache.Set(dummyKey, new CancellationTokenSource(), dummyOptions);
+                dummyEntry = MemoryCache.Set(dummyKey, new CancellationTokenSource(), new MemoryCacheEntryOptions() { Priority = CacheItemPriority.NeverRemove });
             }
 
             return dummyEntry;

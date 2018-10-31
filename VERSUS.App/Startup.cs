@@ -25,20 +25,27 @@ namespace VERSUS.App
 
         public Startup(IConfiguration configuration, IHostingEnvironment env)
 		{
-			Configuration = configuration;
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+            if (env.IsDevelopment())
+            {
+                //builder.AddUserSecrets();
+            }
+
+            builder.AddEnvironmentVariables();
+            Configuration = builder.Build();
             Environment = env;
 		}
 
 		// Add services to the container. This method is called by the runtime.
 		public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
-            services.AddOptions()
+            services.Configure<VersusOptions>(Configuration)
 
-                    .Configure<VersusOptions>(Configuration)
-
-                    .AddDatabaseContext(Configuration, Environment)
-
-                    .AddMemoryCache()
+                    .AddDatabaseContext(Configuration, Environment)                    
 
                     .Configure<CookiePolicyOptions>(Configuration)
                     .PostConfigure<CookiePolicyOptions>(options =>
@@ -76,7 +83,7 @@ namespace VERSUS.App
 
 			app.UseMiddleware<ExceptionClearResponseMiddleware>();
 
-			// Initialise ReactJS.NET. Must be before static files.
+			// Initialize ReactJS.NET. Must be before static files.
 			app.UseReact(config =>
 			{
 				// Server-side rendering of React components. Babel and React are provided manually.

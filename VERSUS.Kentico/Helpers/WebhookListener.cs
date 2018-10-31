@@ -7,7 +7,7 @@ namespace VERSUS.Kentico.Helpers
     {
         public event EventHandler<WebhookNotificationEventArgs> WebhookNotification = delegate { };
 
-        public void RaiseWebhookNotification(object sender, string operation, IdentifierSet identifierSet)
+        public void RaiseWebhookNotification(object sender, string operation, CacheIdentifierPair identifierSet)
         {
             if (sender == null)
             {

@@ -10,23 +10,20 @@ namespace VERSUS.Infrastructure.Extensions
 {
     public static class ServicesExtensions
     {
-        /// <summary>
-        /// Application settings.
-        /// </summary>
-        public static IOptions<VersusOptions> VersusOptions { get; set; }
-
         public static IServiceCollection AddDatabaseContext(this IServiceCollection services, IConfiguration configuration, IHostingEnvironment env)
         {
+            var versusOptions = services.BuildServiceProvider().GetRequiredService<IOptions<VersusOptions>>().Value;
+
             services.AddDbContextPool<DbContext>(
                 options => options
                             .UseSqlServer(
-                                    VersusOptions.Value.ConnectionString,
+                                    versusOptions.ConnectionString,
 
                                     // Retry with some safe SQL exceptions
                                     x => x.EnableRetryOnFailure()
 
                                     //Set command timeout
-                                    .CommandTimeout(VersusOptions.Value.CommandTimeout))
+                                    .CommandTimeout(versusOptions.CommandTimeout))
 
                             // Throw an exception if there is an issue converting LINQ to database calls
                             .ConfigureWarnings(x => x.Throw(RelationalEventId.QueryClientEvaluationWarning))

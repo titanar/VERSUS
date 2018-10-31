@@ -2,19 +2,19 @@
 
 namespace VERSUS.Kentico.Areas.WebHooks.Models
 {
-    public class IdentifierSet : IEquatable<IdentifierSet>
+    public class CacheIdentifierPair : IEquatable<CacheIdentifierPair>
     {
-        public string Type { get; set; }
+        public string TypeName { get; set; }
         public string Codename { get; set; }
 
-        public bool Equals(IdentifierSet other)
+        public bool Equals(CacheIdentifierPair other)
         {
             if (other != null && ReferenceEquals(this, other))
             {
                 return true;
             }
 
-            return Type.Equals(other.Type, StringComparison.Ordinal) && Codename.Equals(other.Codename, StringComparison.Ordinal);
+            return TypeName.Equals(other.TypeName, StringComparison.Ordinal) && Codename.Equals(other.Codename, StringComparison.Ordinal);
         }
     }
 }
