@@ -9,7 +9,7 @@ namespace VERSUS.Kentico.Helpers
 {
     public static class KenticoCloudCacheHelper
     {
-        #region "Constants"
+        #region Constants
 
         public const string CONTENT_ITEM_SINGLE_IDENTIFIER = "content_item";
         public const string CONTENT_ITEM_SINGLE_JSON_IDENTIFIER = CONTENT_ITEM_SINGLE_IDENTIFIER + JSON_SUFFIX;
@@ -31,7 +31,6 @@ namespace VERSUS.Kentico.Helpers
         public const string TAXONOMY_GROUP_LISTING_IDENTIFIER = TAXONOMY_GROUP_SINGLE_IDENTIFIER + LISTING_SUFFIX;
         public const string TAXONOMY_GROUP_LISTING_JSON_IDENTIFIER = TAXONOMY_GROUP_LISTING_IDENTIFIER + JSON_SUFFIX;
 
-        public const string DUMMY_IDENTIFIER = "dummy";
         public const string CODENAME_IDENTIFIER = "codename";
         public const string SYSTEM_IDENTIFIER = "system";
         public const string MODULAR_CONTENT_IDENTIFIER = "modular_content";
@@ -48,102 +47,93 @@ namespace VERSUS.Kentico.Helpers
         private const string TYPED_SUFFIX = "_typed";
         private const string RUNTIME_TYPED_SUFFIX = "_runtime_typed";
 
-        #endregion
-
-        #region "Properties"
-
-        public static IEnumerable<string> ContentItemSingleRelatedFormats
-        {
-            get
+        private static readonly Dictionary<string, IEnumerable<string>> RelatedFormats = new Dictionary<string, IEnumerable<string>>()
             {
-                return new[]
-                {
-                    CONTENT_ITEM_SINGLE_IDENTIFIER,
-                    CONTENT_ITEM_SINGLE_JSON_IDENTIFIER,
-                    CONTENT_ITEM_SINGLE_TYPED_IDENTIFIER,
-                    CONTENT_ITEM_SINGLE_RUNTIME_TYPED_IDENTIFIER,
-                    CONTENT_ITEM_VARIANT_SINGLE_IDENTIFIER,
-                };
-            }
-        }
+                { CONTENT_ITEM_SINGLE_IDENTIFIER, ContentItemSingleRelatedFormats },
+                { CONTENT_ITEM_SINGLE_JSON_IDENTIFIER, ContentItemSingleRelatedFormats },
+                { CONTENT_ITEM_SINGLE_TYPED_IDENTIFIER, ContentItemSingleRelatedFormats },
+                { CONTENT_ITEM_SINGLE_RUNTIME_TYPED_IDENTIFIER, ContentItemSingleRelatedFormats },
+                { CONTENT_ITEM_VARIANT_SINGLE_IDENTIFIER, ContentItemSingleRelatedFormats },
+                { CONTENT_ITEM_LISTING_IDENTIFIER, ContentItemListingRelatedFormats },
+                { CONTENT_ITEM_LISTING_JSON_IDENTIFIER, ContentItemListingRelatedFormats },
+                { CONTENT_ITEM_LISTING_TYPED_IDENTIFIER, ContentItemListingRelatedFormats },
+                { CONTENT_ITEM_LISTING_RUNTIME_TYPED_IDENTIFIER, ContentItemListingRelatedFormats },
+                { CONTENT_TYPE_SINGLE_IDENTIFIER, ContentTypeSingleRelatedFormats },
+                { CONTENT_TYPE_SINGLE_JSON_IDENTIFIER, ContentTypeSingleRelatedFormats },
+                { CONTENT_TYPE_LISTING_IDENTIFIER, ContentTypeListingRelatedFormats },
+                { CONTENT_TYPE_LISTING_JSON_IDENTIFIER, ContentTypeListingRelatedFormats },
+                { CONTENT_ELEMENT_IDENTIFIER, ContentElementRelatedFormats },
+                { CONTENT_ELEMENT_JSON_IDENTIFIER, ContentElementRelatedFormats },
+                { TAXONOMY_GROUP_SINGLE_IDENTIFIER, TaxonomyGroupSingleRelatedFormats },
+                { TAXONOMY_GROUP_SINGLE_JSON_IDENTIFIER, TaxonomyGroupSingleRelatedFormats },
+                { TAXONOMY_GROUP_LISTING_IDENTIFIER, TaxonomyGroupListingRelatedFormats },
+                { TAXONOMY_GROUP_LISTING_JSON_IDENTIFIER, TaxonomyGroupListingRelatedFormats }
+            };
 
-        public static IEnumerable<string> ContentItemListingRelatedFormats
+        #endregion Constants
+
+        #region Properties
+
+        public static IEnumerable<string> ContentItemSingleRelatedFormats => new[]
         {
-            get
-            {
-                return new[]
-                {
-                    CONTENT_ITEM_LISTING_IDENTIFIER,
-                    CONTENT_ITEM_LISTING_JSON_IDENTIFIER,
-                    CONTENT_ITEM_LISTING_TYPED_IDENTIFIER,
-                    CONTENT_ITEM_LISTING_RUNTIME_TYPED_IDENTIFIER
-                };
-            }
-        }
+            CONTENT_ITEM_SINGLE_IDENTIFIER,
+            CONTENT_ITEM_SINGLE_JSON_IDENTIFIER,
+            CONTENT_ITEM_SINGLE_TYPED_IDENTIFIER,
+            CONTENT_ITEM_SINGLE_RUNTIME_TYPED_IDENTIFIER,
+            CONTENT_ITEM_VARIANT_SINGLE_IDENTIFIER,
+        };
 
-        public static IEnumerable<string> ContentTypeSingleRelatedFormats
+        public static IEnumerable<string> ContentItemListingRelatedFormats => new[]
         {
-            get
-            {
-                return new[]
-                {
-                    CONTENT_TYPE_SINGLE_IDENTIFIER,
-                    CONTENT_TYPE_SINGLE_JSON_IDENTIFIER
-                };
-            }
-        }
+            CONTENT_ITEM_LISTING_IDENTIFIER,
+            CONTENT_ITEM_LISTING_JSON_IDENTIFIER,
+            CONTENT_ITEM_LISTING_TYPED_IDENTIFIER,
+            CONTENT_ITEM_LISTING_RUNTIME_TYPED_IDENTIFIER
+        };
 
-        public static IEnumerable<string> ContentTypeListingRelatedFormats
+        public static IEnumerable<string> ContentTypeSingleRelatedFormats => new[]
         {
-            get
-            {
-                return new[]
-                {
-                    CONTENT_TYPE_LISTING_IDENTIFIER,
-                    CONTENT_TYPE_LISTING_JSON_IDENTIFIER
-                };
-            }
-        }
+            CONTENT_TYPE_SINGLE_IDENTIFIER,
+            CONTENT_TYPE_SINGLE_JSON_IDENTIFIER
+        };
 
-        public static IEnumerable<string> ContentElementRelatedFormats
+        public static IEnumerable<string> ContentTypeListingRelatedFormats => new[]
         {
-            get
-            {
-                return new[]
-                {
-                    CONTENT_ELEMENT_IDENTIFIER,
-                    CONTENT_ELEMENT_JSON_IDENTIFIER
-                };
-            }
-        }
+            CONTENT_TYPE_LISTING_IDENTIFIER,
+            CONTENT_TYPE_LISTING_JSON_IDENTIFIER
+        };
 
-        public static IEnumerable<string> TaxonomyGroupSingleRelatedFormats
+        public static IEnumerable<string> ContentElementRelatedFormats => new[]
         {
-            get
-            {
-                return new[]
-                {
-                    TAXONOMY_GROUP_SINGLE_IDENTIFIER,
-                    TAXONOMY_GROUP_SINGLE_JSON_IDENTIFIER
-                };
-            }
-        }
+            CONTENT_ELEMENT_IDENTIFIER,
+            CONTENT_ELEMENT_JSON_IDENTIFIER
+        };
 
-        public static IEnumerable<string> TaxonomyGroupListingRelatedFormats
+        public static IEnumerable<string> TaxonomyGroupSingleRelatedFormats => new[]
         {
-            get
-            {
-                return new[]
-                {
-                    TAXONOMY_GROUP_LISTING_IDENTIFIER,
-                    TAXONOMY_GROUP_LISTING_JSON_IDENTIFIER
-                };
-            }
-        }
+            TAXONOMY_GROUP_SINGLE_IDENTIFIER,
+            TAXONOMY_GROUP_SINGLE_JSON_IDENTIFIER
+        };
 
-        #endregion
+        public static IEnumerable<string> TaxonomyGroupListingRelatedFormats => new[]
+        {
+            TAXONOMY_GROUP_LISTING_IDENTIFIER,
+            TAXONOMY_GROUP_LISTING_JSON_IDENTIFIER
+        };
 
-        #region "Public methods"
+        public static List<string> InvalidatingOperations => new List<string>
+        {
+            "upsert",
+            "publish",
+            "restore_publish",
+            "unpublish",
+            "archive",
+            "restore"
+        };
+
+        #endregion Properties
+
+        #region Public methods
 
         public static IEnumerable<string> GetItemJsonTaxonomyCodenamesByElements(JToken elementsToken)
         {
@@ -171,8 +161,8 @@ namespace VERSUS.Kentico.Helpers
 
                 foreach (var property in properties)
                 {
-                    if (property.PropertyType.GenericTypeArguments.Length > 0 && 
-                        property.PropertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>) && 
+                    if (property.PropertyType.GenericTypeArguments.Length > 0 &&
+                        property.PropertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>) &&
                         property.PropertyType.GenericTypeArguments[0] == typeof(TaxonomyTerm))
                     {
                         var codenameProperty = item.GetType().GetField($"{property.Name}Codename");
@@ -185,15 +175,15 @@ namespace VERSUS.Kentico.Helpers
 
         public static bool IsDeliveryItemSingleResponse(dynamic response)
         {
-            return (response is DeliveryItemResponse || 
-                (response.GetType().IsGenericType && 
+            return (response is DeliveryItemResponse ||
+                (response.GetType().IsGenericType &&
                 response.GetType().GetGenericTypeDefinition() == typeof(DeliveryItemResponse<>))) ? true : false;
         }
 
         public static bool IsDeliveryItemListingResponse(dynamic response)
         {
-            return (response is DeliveryItemListingResponse || 
-                (response.GetType().IsGenericType && 
+            return (response is DeliveryItemListingResponse ||
+                (response.GetType().IsGenericType &&
                 response.GetType().GetGenericTypeDefinition() == typeof(DeliveryItemListingResponse<>))) ? true : false;
         }
 
@@ -234,6 +224,11 @@ namespace VERSUS.Kentico.Helpers
             }
         }
 
-        #endregion
+        public static IEnumerable<string> GetDependentTypeNames(string typeCodeName)
+        {
+            return RelatedFormats[typeCodeName];
+        }
+
+        #endregion Public methods
     }
 }

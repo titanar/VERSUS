@@ -9,25 +9,25 @@ using VERSUS.Core;
 
 namespace VERSUS.App.Controllers
 {
-	public class SharedController : Controller
-	{
-        private readonly IMemoryCache memoryCache;
+    public class SharedController : Controller
+    {
+        private readonly IMemoryCache _memoryCache;
 
         private IDeliveryClient DeliveryClient { get; }
 
         protected DeliveryObservableProxy DeliveryObservable => new DeliveryObservableProxy(DeliveryClient);
 
-		public SharedController(IDeliveryClient deliveryClient, IMemoryCache memoryCache)
-		{
-			this.memoryCache = memoryCache;
+        public SharedController(IDeliveryClient deliveryClient, IMemoryCache memoryCache)
+        {
+            _memoryCache = memoryCache;
 
-			// Use the memory cache for Delivery client
-			DeliveryClient = memoryCache.GetOrCreate(VersusConstants.CACHE_DeliveryClient, entry =>
-			{
-				entry.SlidingExpiration = TimeSpan.FromHours(1);
+            // Use the memory cache for Delivery client
+            DeliveryClient = memoryCache.GetOrCreate(VersusConstants.CACHE_DeliveryClient, entry =>
+            {
+                entry.SlidingExpiration = TimeSpan.FromHours(1);
 
-				return deliveryClient;
-			});
-		}
-	}
+                return deliveryClient;
+            });
+        }
+    }
 }

@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VERSUS.Core\VERSUS.Core.csproj" />
+    <ProjectReference Include="..\VERSUS.Kentico\VERSUS.Kentico.csproj" />
   </ItemGroup>
 
 </Project>

@@ -7,9 +7,9 @@ namespace VERSUS.Kentico.Helpers
 {
     public static class WebhookObservableFactory
     {
-        public static IObservable<WebhookNotificationEventArgs> GetObservable(object sender, string eventName)
+        public static IObservable<CacheInvalidationEventArgs> GetObservable(object sender, string eventName)
         {
-            return Observable.FromEventPattern<WebhookNotificationEventArgs>(sender, eventName).Select(e => e.EventArgs);
+            return Observable.FromEventPattern<CacheInvalidationEventArgs>(sender, eventName).Select(e => e.EventArgs);
         }
     }
 }

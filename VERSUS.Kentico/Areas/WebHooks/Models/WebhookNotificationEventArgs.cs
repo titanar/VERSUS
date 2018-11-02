@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace VERSUS.Kentico.Areas.WebHooks.Models
 {
-    public class WebhookNotificationEventArgs : EventArgs, IEquatable<WebhookNotificationEventArgs>
+    public class CacheInvalidationEventArgs : EventArgs, IEquatable<CacheInvalidationEventArgs>
     {
-        public CacheIdentifierPair IdentifierSet { get; }
+        public CacheTokenPair IdentifierSet { get; }
         public string Operation { get; }
 
-        public WebhookNotificationEventArgs(CacheIdentifierPair identifierSet, string operation)
+        public CacheInvalidationEventArgs(CacheTokenPair identifierSet, string operation)
         {
             if (identifierSet != null && !string.IsNullOrEmpty(operation))
             {
@@ -19,7 +16,7 @@ namespace VERSUS.Kentico.Areas.WebHooks.Models
             }
         }
 
-        public bool Equals(WebhookNotificationEventArgs other)
+        public bool Equals(CacheInvalidationEventArgs other)
         {
             if (other != null && ReferenceEquals(this, other))
             {

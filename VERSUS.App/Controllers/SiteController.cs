@@ -13,30 +13,31 @@ using VERSUS.Kentico.Models;
 
 namespace VERSUS.App.Controllers
 {
-	public class SiteController : SharedController
-	{
-		public SiteController(IDeliveryClient deliveryClient, IMemoryCache memoryCache) : base(deliveryClient, memoryCache)
-		{
-		}
+    public class SiteController : SharedController
+    {
+        public SiteController(IDeliveryClient deliveryClient, IMemoryCache memoryCache) : base(deliveryClient, memoryCache)
+        {
+        }
 
         [Route("/")]
         public async Task<IActionResult> Index()
-		{
-			var siteObservable = await DeliveryObservable
-										.GetItemObservable<Site>("site")
-										.Select(s => new SiteViewModel(s));
+        {
+            var siteObservable = await DeliveryObservable
+                                        .GetItemObservable<Site>("site")
+                                        .Select(s => new SiteViewModel(s));
 
-			return View(siteObservable);
-		}
+            return View(siteObservable);
+        }
 
         [Route("/Error/{errorCode?}")]
-		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-		public IActionResult Error(int? errorCode = null)
-		{
-			return View(new ErrorViewModel {
-				RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
-				ErrorCode = errorCode
-			});
-		}
-	}
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error(int? errorCode = null)
+        {
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
+                ErrorCode = errorCode
+            });
+        }
+    }
 }

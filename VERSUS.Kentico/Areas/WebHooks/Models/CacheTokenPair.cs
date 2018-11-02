@@ -2,12 +2,12 @@
 
 namespace VERSUS.Kentico.Areas.WebHooks.Models
 {
-    public class CacheIdentifierPair : IEquatable<CacheIdentifierPair>
+    public class CacheTokenPair : IEquatable<CacheTokenPair>
     {
         public string TypeName { get; set; }
         public string Codename { get; set; }
 
-        public bool Equals(CacheIdentifierPair other)
+        public bool Equals(CacheTokenPair other)
         {
             if (other != null && ReferenceEquals(this, other))
             {

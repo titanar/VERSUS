@@ -11,7 +11,7 @@ namespace VERSUS.Kentico.Helpers
         /// <summary>
         /// Method to deal with the notification.
         /// </summary>
-        event EventHandler<WebhookNotificationEventArgs> WebhookNotification;
+        event EventHandler<CacheInvalidationEventArgs> WebhookNotification;
 
         /// <summary>
         /// Raises the event.
@@ -19,6 +19,6 @@ namespace VERSUS.Kentico.Helpers
         /// <param name="sender">Initiator of the invocation.</param>
         /// <param name="operation">Codename of the remote operation being advertised through the webhook call.</param>
         /// <param name="identifierSet">Identifiers of the data being processed by the <paramref name="operation"/>.</param>
-        void RaiseWebhookNotification(object sender, string operation, CacheIdentifierPair identifierSet);
+        void RaiseWebhookNotification(object sender, string operation, CacheTokenPair identifierSet);
     }
 }

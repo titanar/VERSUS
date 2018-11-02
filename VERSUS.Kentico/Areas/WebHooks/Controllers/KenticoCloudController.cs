@@ -45,7 +45,7 @@ namespace VERSUS.Kentico.Areas.WebHooks.Controllers
                 WebhookListener.RaiseWebhookNotification(
                     this,
                     operation,
-                    new CacheIdentifierPair
+                    new CacheTokenPair
                     {
                         TypeName = artefactType,
                         Codename = item.Codename
