@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Linq;
+
 using KenticoCloud.Delivery;
 using KenticoCloud.Delivery.ImageTransformation;
+
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Options;
-using VERSUS.Core;
 
 namespace VERSUS.Kentico.Extensions
 {
     public static class HtmlHelperExtensions
     {
-        /// <summary>
-        /// Application settings.
-        /// </summary>
-        public static IOptions<VersusOptions> ProjectOptions { get; set; }
+        public static int[] ResponsiveWidths { get; set; }
+
+        public static bool ResponsiveImagesEnabled { get; set; }
 
         /// <summary>
         /// Generates an IMG tag for an image file.
@@ -48,7 +47,7 @@ namespace VERSUS.Kentico.Extensions
                 imageUrlBuilder = imageUrlBuilder.WithHeight(Convert.ToDouble(height));
             }
 
-            if (ProjectOptions.Value.ResponsiveImagesEnabled && !width.HasValue && !height.HasValue)
+            if (ResponsiveImagesEnabled && !width.HasValue && !height.HasValue)
             {
                 image.MergeAttribute("srcset", GenerateSrcsetValue(asset.Url));
 
@@ -72,7 +71,7 @@ namespace VERSUS.Kentico.Extensions
         {
             var imageUrlBuilder = new ImageUrlBuilder(imageUrl);
 
-            return string.Join(",", ProjectOptions.Value.ResponsiveWidths.Select(w
+            return string.Join(",", ResponsiveWidths.Select(w
                 => $"{imageUrlBuilder.WithWidth(Convert.ToDouble(w)).Url} {w}w"));
         }
     }

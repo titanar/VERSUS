@@ -7,7 +7,8 @@ using KenticoCloud.Delivery;
 using KenticoCloud.Delivery.InlineContentItems;
 
 using Newtonsoft.Json.Linq;
-using Versus.Core.Extensions;
+
+using VERSUS.Core.Extensions;
 using VERSUS.Kentico.Areas.WebHooks.Models;
 using VERSUS.Kentico.Helpers;
 
@@ -18,6 +19,7 @@ namespace VERSUS.Kentico.Services
         #region Properties
 
         private IDeliveryClient DeliveryClient { get; }
+
         private ICacheManager CacheManager { get; }
 
         public IContentLinkUrlResolver ContentLinkUrlResolver

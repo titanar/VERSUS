@@ -1,6 +1,6 @@
 ﻿namespace VERSUS.Kentico.Areas.WebHooks.Models
 {
-    public interface ICodenamedData
+    public interface IWebhookCodenamedData
     {
         string Codename { get; set; }
     }

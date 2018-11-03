@@ -11,7 +11,6 @@ namespace VERSUS.Kentico.Extensions
         private readonly int _defaultWidth;
         private readonly List<MediaCondition> _mediaContitions;
 
-
         /// <summary>
         /// Creates new <see cref="ResponsiveImageSizes"/> instance with default width.
         /// </summary>
@@ -36,7 +35,9 @@ namespace VERSUS.Kentico.Extensions
         /// <summary>
         /// Generates sizes attribute value.
         /// </summary>
-        public string GenerateSizesValue() =>
-            string.Join(", ", _mediaContitions.Select(mc => mc.ToString()).Concat(new string[] { $"{_defaultWidth}px" }));
+        public string GenerateSizesValue()
+        {
+            return string.Join(", ", _mediaContitions.Select(mc => mc.ToString()).Concat(new string[] { $"{_defaultWidth}px" }));
+        }
     }
 }

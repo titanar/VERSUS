@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+
 using VERSUS.Core;
 using VERSUS.Kentico.Areas.WebHooks.Models;
 using VERSUS.Kentico.Helpers;
 
 namespace VERSUS.Kentico.Services
 {
-    public class ReactiveCacheManager : ICacheManager
+    public class CacheManager : ICacheManager
     {
         #region Constants
 
@@ -38,17 +39,11 @@ namespace VERSUS.Kentico.Services
 
         #region Constructors
 
-        public ReactiveCacheManager(IOptions<VersusOptions> versusOptions, IMemoryCache memoryCache)
+        public CacheManager(IOptionsSnapshot<VersusOptions> versusOptions, IMemoryCache memoryCache)
         {
             _cacheExpirySeconds = versusOptions.Value.CacheTimeoutSeconds;
             _createCacheEntriesInBackground = versusOptions.Value.CreateCacheEntriesInBackground;
             _memoryCache = memoryCache;
-
-            //Observable.FromEventPattern<CacheInvalidationEventArgs>(webhookListener, nameof(webhookListener.WebhookNotification))
-            //    .Where(e => KenticoCloudCacheHelper.InvalidatingOperations.Any(operation => operation.Equals(e.EventArgs.Operation, StringComparison.Ordinal)))
-            //    .Throttle(TimeSpan.FromSeconds(1))
-            //    .DistinctUntilChanged()
-            //    .Subscribe(e => InvalidateEntry(e.EventArgs.IdentifierSet));
         }
 
         #endregion Constructors

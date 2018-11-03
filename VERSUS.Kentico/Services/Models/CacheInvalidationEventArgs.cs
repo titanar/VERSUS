@@ -5,6 +5,7 @@ namespace VERSUS.Kentico.Areas.WebHooks.Models
     public class CacheInvalidationEventArgs : EventArgs, IEquatable<CacheInvalidationEventArgs>
     {
         public CacheTokenPair IdentifierSet { get; }
+
         public string Operation { get; }
 
         public CacheInvalidationEventArgs(CacheTokenPair identifierSet, string operation)

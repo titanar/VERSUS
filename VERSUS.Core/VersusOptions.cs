@@ -18,12 +18,6 @@ namespace VERSUS.Core
 
         public int[] ResponsiveWidths { get; set; }
 
-        public bool ResponsiveImagesEnabled
-        {
-            get
-            {
-                return ResponsiveWidths != null && ResponsiveWidths.Count() > 0;
-            }
-        }
+        public bool ResponsiveImagesEnabled => ResponsiveWidths != null && ResponsiveWidths.Count() > 0;
     }
 }

@@ -1,37 +1,37 @@
 ﻿using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
 using KenticoCloud.Delivery;
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 
 using VERSUS.App.Models;
+using VERSUS.Infrastructure.Extensions;
 using VERSUS.Kentico.Models;
 
 namespace VERSUS.App.Controllers
 {
     public class SiteController : SharedController
     {
-        public SiteController(IDeliveryClient deliveryClient, IMemoryCache memoryCache) : base(deliveryClient, memoryCache)
+        public SiteController(IDeliveryClient deliveryClient) : base(deliveryClient)
         {
         }
 
-        [Route("/")]
+        [Route("")]
         public async Task<IActionResult> Index()
         {
-            var siteObservable = await DeliveryObservable
-                                        .GetItemObservable<Site>("site")
-                                        .Select(s => new SiteViewModel(s));
-
-            return View(siteObservable);
+            return await DeliveryObservable
+                .GetItemObservable<Site>("site")
+                .Select(s => new SiteViewModel(s))
+                .ToActionResult(View);
         }
 
-        [Route("/Error/{errorCode?}")]
+        [Route("Error/{errorCode?}")]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error(int? errorCode = null)
+        public IActionResult Error(HttpStatusCode errorCode = HttpStatusCode.InternalServerError)
         {
             return View(new ErrorViewModel
             {

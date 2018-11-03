@@ -1,14 +1,13 @@
-using System;
-using System.ComponentModel.DataAnnotations;
+using System.Net;
 
 namespace VERSUS.App.Models
 {
-	public class ErrorViewModel
-	{
-		public string RequestId { get; set; }
+    public class ErrorViewModel
+    {
+        public string RequestId { get; set; }
 
-		public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 
-		public int? ErrorCode { get; set; }
-	}
+        public HttpStatusCode ErrorCode { get; set; }
+    }
 }

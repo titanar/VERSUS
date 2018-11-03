@@ -7,6 +7,7 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
+
 using VERSUS.Core;
 
 namespace VERSUS.Kentico.Filters
@@ -15,7 +16,7 @@ namespace VERSUS.Kentico.Filters
     {
         private readonly string _secret;
 
-        public KenticoCloudSignatureActionFilter(IOptions<VersusOptions> versusOptions)
+        public KenticoCloudSignatureActionFilter(IOptionsSnapshot<VersusOptions> versusOptions)
         {
             _secret = versusOptions.Value.KenticoCloudWebhookSecret;
         }

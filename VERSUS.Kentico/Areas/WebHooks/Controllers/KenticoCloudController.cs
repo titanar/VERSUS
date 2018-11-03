@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 using Microsoft.AspNetCore.Mvc;
+
+using VERSUS.Kentico.Areas.WebHooks.Models;
+using VERSUS.Kentico.Areas.WebHooks.Services;
 using VERSUS.Kentico.Filters;
 using VERSUS.Kentico.Helpers;
-using VERSUS.Kentico.Models;
-using VERSUS.Kentico.Services;
-using VERSUS.Kentico.Areas.WebHooks.Models;
 
 namespace VERSUS.Kentico.Areas.WebHooks.Controllers
 {
@@ -17,12 +16,12 @@ namespace VERSUS.Kentico.Areas.WebHooks.Controllers
 
         public KenticoCloudController(IWebhookListener kenticoCloudWebhookListener)
         {
-            WebhookListener = kenticoCloudWebhookListener ?? throw new ArgumentNullException(nameof(kenticoCloudWebhookListener));
+            WebhookListener = kenticoCloudWebhookListener;
         }
 
         [HttpPost]
         [ServiceFilter(typeof(KenticoCloudSignatureActionFilter))]
-        public IActionResult Index([FromBody] KenticoCloudWebhookModel model)
+        public IActionResult Index([FromBody] WebhookModel model)
         {
             switch (model.Message.Type)
             {
@@ -30,15 +29,17 @@ namespace VERSUS.Kentico.Areas.WebHooks.Controllers
                 case KenticoCloudCacheHelper.CONTENT_ITEM_VARIANT_SINGLE_IDENTIFIER:
                 case KenticoCloudCacheHelper.CONTENT_TYPE_SINGLE_IDENTIFIER:
                     return RaiseNotificationForSupportedOperations(model.Message.Operation, model.Message.Type, model.Data.Items);
+
                 case KenticoCloudCacheHelper.TAXONOMY_GROUP_SINGLE_IDENTIFIER:
                     return RaiseNotificationForSupportedOperations(model.Message.Operation, model.Message.Type, model.Data.Taxonomies);
+
                 default:
                     // For all other types of artifacts, return OK to avoid webhook re-submissions.
                     return Ok();
             }
         }
 
-        private IActionResult RaiseNotificationForSupportedOperations(string operation, string artefactType, IEnumerable<ICodenamedData> data)
+        private IActionResult RaiseNotificationForSupportedOperations(string operation, string artefactType, IEnumerable<IWebhookCodenamedData> data)
         {
             foreach (var item in data)
             {

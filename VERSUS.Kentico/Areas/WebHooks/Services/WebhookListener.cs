@@ -1,11 +1,25 @@
 ﻿using System;
-using VERSUS.Kentico.Areas.WebHooks.Models;
+using System.Linq;
+using System.Reactive.Linq;
 
-namespace VERSUS.Kentico.Helpers
+using VERSUS.Kentico.Areas.WebHooks.Models;
+using VERSUS.Kentico.Helpers;
+using VERSUS.Kentico.Services;
+
+namespace VERSUS.Kentico.Areas.WebHooks.Services
 {
     public class WebhookListener : IWebhookListener
     {
         public event EventHandler<CacheInvalidationEventArgs> WebhookNotification = delegate { };
+
+        public WebhookListener(ICacheManager cacheManager)
+        {
+            Observable.FromEventPattern<CacheInvalidationEventArgs>(this, nameof(WebhookNotification))
+                .Where(e => KenticoCloudCacheHelper.InvalidatingOperations.Any(operation => operation.Equals(e.EventArgs.Operation, StringComparison.Ordinal)))
+                .Throttle(TimeSpan.FromSeconds(1))
+                .DistinctUntilChanged()
+                .Subscribe(e => cacheManager.InvalidateEntry(e.EventArgs.IdentifierSet));
+        }
 
         public void RaiseWebhookNotification(object sender, string operation, CacheTokenPair identifierSet)
         {

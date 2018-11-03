@@ -1,7 +1,8 @@
 ﻿using System;
+
 using VERSUS.Kentico.Areas.WebHooks.Models;
 
-namespace VERSUS.Kentico.Helpers
+namespace VERSUS.Kentico.Areas.WebHooks.Services
 {
     /// <summary>
     /// Invokes an event, based on a webhook notification.

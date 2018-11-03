@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Versus.Core.Extensions
+namespace VERSUS.Core.Extensions
 {
     public static class ListExtensions
     {

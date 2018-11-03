@@ -5,16 +5,16 @@ using VERSUS.Kentico.Models;
 
 namespace VERSUS.App.Models
 {
-	public class SiteViewModel
-	{
-		public IEnumerable<SidebarItemViewModel> Sidebar { get; set; }
+    public class SiteViewModel
+    {
+        public IEnumerable<SidebarItemViewModel> Sidebar { get; set; }
 
-		public string Announcement { get; set; }
+        public string Announcement { get; set; }
 
-		public SiteViewModel(Site site)
-		{
-			Announcement = site.Announcement;
-			Sidebar = site.Sidebar.Select(s => new SidebarItemViewModel(s));
-		}
-	}
+        public SiteViewModel(Site site)
+        {
+            Announcement = site.Announcement;
+            Sidebar = site.Sidebar?.Select(s => new SidebarItemViewModel(s));
+        }
+    }
 }

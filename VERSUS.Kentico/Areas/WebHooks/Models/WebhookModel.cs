@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace VERSUS.Kentico.Areas.WebHooks.Models
 {
-    public class KenticoCloudWebhookModel
+    public class WebhookModel
     {
         [JsonProperty("message")]
         public Message Message { get; set; }
@@ -40,7 +40,7 @@ namespace VERSUS.Kentico.Areas.WebHooks.Models
         public Taxonomy[] Taxonomies { get; set; }
     }
 
-    public class Item : ICodenamedData
+    public class Item : IWebhookCodenamedData
     {
         [JsonProperty("language")]
         public string Language { get; set; }
@@ -52,7 +52,7 @@ namespace VERSUS.Kentico.Areas.WebHooks.Models
         public string Codename { get; set; }
     }
 
-    public class Taxonomy : ICodenamedData
+    public class Taxonomy : IWebhookCodenamedData
     {
         [JsonProperty("codename")]
         public string Codename { get; set; }

@@ -1,16 +1,22 @@
 ﻿using System;
+using System.Reflection;
+
 using KenticoCloud.Delivery;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+
 using React.AspNet;
+
 using VERSUS.App.Resolvers;
 using VERSUS.Core;
 using VERSUS.Core.Extensions;
 using VERSUS.Infrastructure.Extensions;
+using VERSUS.Kentico.Areas.WebHooks.Controllers;
 using VERSUS.Kentico.Extensions;
 
 namespace VERSUS.App
@@ -18,6 +24,7 @@ namespace VERSUS.App
     public class Startup
     {
         public IConfiguration Configuration { get; }
+
         public IHostingEnvironment Environment { get; }
 
         public Startup(IConfiguration configuration, IHostingEnvironment env)
@@ -57,13 +64,15 @@ namespace VERSUS.App
 
                     .AddReactServices()
 
-                    .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest);
+                    .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest)
+
+                    .AddApplicationPart(typeof(KenticoCloudController).GetTypeInfo().Assembly).AddControllersAsServices();
 
             return services.BuildServiceProvider();
         }
 
         // Configure the HTTP request pipeline. The order of these methods matters. This method is called by the runtime.
-        public void Configure(IApplicationBuilder app, IOptions<VersusOptions> options)
+        public void Configure(IApplicationBuilder app, IOptionsSnapshot<VersusOptions> options)
         {
             app.UseHttpsRedirection()
                 .UseStatusCodePagesWithReExecute(options.Value.ErrorHandlingRoute + "/{0}");
@@ -94,7 +103,12 @@ namespace VERSUS.App
                 .UseStaticFiles()
                 .UseCookiePolicy()
 
-                .UseMvc();
+                .UseMvc(routes =>
+                {
+                    routes.MapRoute(
+                        name: "areas",
+                        template: "{area:exists}/{controller}/{action=Index}");
+                });
         }
     }
 }

@@ -1,9 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
+﻿using System;
+
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+
 using VERSUS.Core;
 
 namespace VERSUS.Infrastructure.Extensions
@@ -12,7 +15,9 @@ namespace VERSUS.Infrastructure.Extensions
     {
         public static IServiceCollection AddDatabaseContext(this IServiceCollection services, IConfiguration configuration, IHostingEnvironment env)
         {
-            var versusOptions = services.BuildServiceProvider().GetRequiredService<IOptions<VersusOptions>>().Value;
+            var versusOptions = services.BuildServiceProvider().GetRequiredService<IOptionsSnapshot<VersusOptions>>().Value;
+
+            ObservableExtensions.DefaultTimeout = TimeSpan.FromSeconds(versusOptions.CommandTimeout);
 
             services.AddDbContextPool<DbContext>(
                 options => options

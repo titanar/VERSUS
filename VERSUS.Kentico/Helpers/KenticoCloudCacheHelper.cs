@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using KenticoCloud.Delivery;
+
 using Newtonsoft.Json.Linq;
 
 namespace VERSUS.Kentico.Helpers
