@@ -1,14 +1,14 @@
 ﻿using System;
 
-namespace VERSUS.Kentico.Areas.WebHooks.Models
+namespace VERSUS.Kentico.Webhooks.Models
 {
-    public class CacheInvalidationEventArgs : EventArgs, IEquatable<CacheInvalidationEventArgs>
+    public class CacheInvalidationModel : IEquatable<CacheInvalidationModel>
     {
         public CacheTokenPair IdentifierSet { get; }
 
         public string Operation { get; }
 
-        public CacheInvalidationEventArgs(CacheTokenPair identifierSet, string operation)
+        public CacheInvalidationModel(CacheTokenPair identifierSet, string operation)
         {
             if (identifierSet != null && !string.IsNullOrEmpty(operation))
             {
@@ -17,7 +17,7 @@ namespace VERSUS.Kentico.Areas.WebHooks.Models
             }
         }
 
-        public bool Equals(CacheInvalidationEventArgs other)
+        public bool Equals(CacheInvalidationModel other)
         {
             if (other != null && ReferenceEquals(this, other))
             {

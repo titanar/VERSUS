@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VERSUS.Kentico.Areas.WebHooks.Models
+namespace VERSUS.Kentico.Webhooks.Models
 {
     public class CacheTokenPair : IEquatable<CacheTokenPair>
     {

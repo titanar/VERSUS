@@ -2,39 +2,35 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 using KenticoCloud.Delivery;
 using KenticoCloud.Delivery.InlineContentItems;
-
 using Newtonsoft.Json.Linq;
-
 using VERSUS.Core.Extensions;
-using VERSUS.Kentico.Areas.WebHooks.Models;
 using VERSUS.Kentico.Helpers;
+using VERSUS.Kentico.Webhooks.Models;
 
 namespace VERSUS.Kentico.Services
 {
     public class CachedDeliveryClient : IDeliveryClient
     {
+        private ICacheManager _cacheManager;
+        private IDeliveryClient _deliveryClient;
+
         #region Properties
-
-        private IDeliveryClient DeliveryClient { get; }
-
-        private ICacheManager CacheManager { get; }
 
         public IContentLinkUrlResolver ContentLinkUrlResolver
         {
-            get => DeliveryClient.ContentLinkUrlResolver;
-            set => DeliveryClient.ContentLinkUrlResolver = value;
+            get => _deliveryClient.ContentLinkUrlResolver;
+            set => _deliveryClient.ContentLinkUrlResolver = value;
         }
 
         public ICodeFirstModelProvider CodeFirstModelProvider
         {
-            get => DeliveryClient.CodeFirstModelProvider;
-            set => DeliveryClient.CodeFirstModelProvider = value;
+            get => _deliveryClient.CodeFirstModelProvider;
+            set => _deliveryClient.CodeFirstModelProvider = value;
         }
 
-        public IInlineContentItemsProcessor InlineContentItemsProcessor => DeliveryClient.InlineContentItemsProcessor;
+        public IInlineContentItemsProcessor InlineContentItemsProcessor => _deliveryClient.InlineContentItemsProcessor;
 
         #endregion Properties
 
@@ -42,8 +38,8 @@ namespace VERSUS.Kentico.Services
 
         public CachedDeliveryClient(ICacheManager cacheManager, IDeliveryClient deliveryClient)
         {
-            DeliveryClient = deliveryClient;
-            CacheManager = cacheManager;
+            _deliveryClient = deliveryClient;
+            _cacheManager = cacheManager;
         }
 
         #endregion Constructors
@@ -61,9 +57,9 @@ namespace VERSUS.Kentico.Services
             var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ITEM_SINGLE_JSON_IDENTIFIER, codename };
             identifierTokens.AddNonNullRange(parameters);
 
-            return await CacheManager.GetOrCreateAsync(
+            return await _cacheManager.GetOrCreateAsync(
                 identifierTokens,
-                () => DeliveryClient.GetItemJsonAsync(codename, parameters),
+                () => _deliveryClient.GetItemJsonAsync(codename, parameters),
                 response => response == null,
                 GetContentItemSingleJsonDependencies);
         }
@@ -78,9 +74,9 @@ namespace VERSUS.Kentico.Services
             var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ITEM_LISTING_JSON_IDENTIFIER };
             identifierTokens.AddNonNullRange(parameters);
 
-            return await CacheManager.GetOrCreateAsync(
+            return await _cacheManager.GetOrCreateAsync(
                 identifierTokens,
-                () => DeliveryClient.GetItemsJsonAsync(parameters),
+                () => _deliveryClient.GetItemsJsonAsync(parameters),
                 response => response["items"].Count() <= 0,
                 GetContentItemListingJsonDependencies);
         }
@@ -119,9 +115,9 @@ namespace VERSUS.Kentico.Services
             var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ITEM_SINGLE_IDENTIFIER, codename };
             identifierTokens.AddNonNullRange(KenticoCloudCacheHelper.GetIdentifiersFromParameters(parameters));
 
-            return await CacheManager.GetOrCreateAsync(
+            return await _cacheManager.GetOrCreateAsync(
                 identifierTokens,
-                () => DeliveryClient.GetItemAsync(codename, parameters),
+                () => _deliveryClient.GetItemAsync(codename, parameters),
                 response => response == null,
                 GetContentItemSingleDependencies);
         }
@@ -138,9 +134,9 @@ namespace VERSUS.Kentico.Services
             var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ITEM_SINGLE_TYPED_IDENTIFIER, codename };
             identifierTokens.AddNonNullRange(KenticoCloudCacheHelper.GetIdentifiersFromParameters(parameters));
 
-            return await CacheManager.GetOrCreateAsync(
+            return await _cacheManager.GetOrCreateAsync(
                 identifierTokens,
-                () => DeliveryClient.GetItemAsync<T>(codename, parameters),
+                () => _deliveryClient.GetItemAsync<T>(codename, parameters),
                 response => response == null,
                 GetContentItemSingleDependencies);
         }
@@ -166,9 +162,9 @@ namespace VERSUS.Kentico.Services
             var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ITEM_LISTING_IDENTIFIER };
             identifierTokens.AddNonNullRange(KenticoCloudCacheHelper.GetIdentifiersFromParameters(parameters));
 
-            return await CacheManager.GetOrCreateAsync(
+            return await _cacheManager.GetOrCreateAsync(
                 identifierTokens,
-                () => DeliveryClient.GetItemsAsync(parameters),
+                () => _deliveryClient.GetItemsAsync(parameters),
                 response => response.Items.Count <= 0,
                 GetContentItemListingDependencies);
         }
@@ -190,9 +186,9 @@ namespace VERSUS.Kentico.Services
             var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ITEM_LISTING_TYPED_IDENTIFIER };
             identifierTokens.AddNonNullRange(KenticoCloudCacheHelper.GetIdentifiersFromParameters(parameters));
 
-            return await CacheManager.GetOrCreateAsync(
+            return await _cacheManager.GetOrCreateAsync(
                 identifierTokens,
-                () => DeliveryClient.GetItemsAsync<T>(parameters),
+                () => _deliveryClient.GetItemsAsync<T>(parameters),
                 response => response.Items.Count <= 0,
                 GetContentItemListingDependencies);
         }
@@ -206,9 +202,9 @@ namespace VERSUS.Kentico.Services
         {
             var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_TYPE_SINGLE_JSON_IDENTIFIER, codename };
 
-            return await CacheManager.GetOrCreateAsync(
+            return await _cacheManager.GetOrCreateAsync(
                 identifierTokens,
-                () => DeliveryClient.GetTypeJsonAsync(codename),
+                () => _deliveryClient.GetTypeJsonAsync(codename),
                 response => response == null,
                 GetTypeSingleJsonDependencies);
         }
@@ -223,9 +219,9 @@ namespace VERSUS.Kentico.Services
             var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_TYPE_LISTING_JSON_IDENTIFIER };
             identifierTokens.AddNonNullRange(parameters);
 
-            return await CacheManager.GetOrCreateAsync(
+            return await _cacheManager.GetOrCreateAsync(
                 identifierTokens,
-                () => DeliveryClient.GetTypesJsonAsync(parameters),
+                () => _deliveryClient.GetTypesJsonAsync(parameters),
                 response => response["types"].Count() <= 0,
                 GetTypeListingJsonDependencies);
         }
@@ -239,9 +235,9 @@ namespace VERSUS.Kentico.Services
         {
             var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_TYPE_SINGLE_IDENTIFIER, codename };
 
-            return await CacheManager.GetOrCreateAsync(
+            return await _cacheManager.GetOrCreateAsync(
                 identifierTokens,
-                () => DeliveryClient.GetTypeAsync(codename),
+                () => _deliveryClient.GetTypeAsync(codename),
                 response => response == null,
                 GetTypeSingleDependencies);
         }
@@ -266,9 +262,9 @@ namespace VERSUS.Kentico.Services
             var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_TYPE_LISTING_IDENTIFIER };
             identifierTokens.AddNonNullRange(KenticoCloudCacheHelper.GetIdentifiersFromParameters(parameters));
 
-            return await CacheManager.GetOrCreateAsync(
+            return await _cacheManager.GetOrCreateAsync(
                 identifierTokens,
-                () => DeliveryClient.GetTypesAsync(parameters),
+                () => _deliveryClient.GetTypesAsync(parameters),
                 response => response.Types.Count <= 0,
                 GetTypeListingDependencies);
         }
@@ -283,9 +279,9 @@ namespace VERSUS.Kentico.Services
         {
             var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ELEMENT_IDENTIFIER, contentTypeCodename, contentElementCodename };
 
-            return await CacheManager.GetOrCreateAsync(
+            return await _cacheManager.GetOrCreateAsync(
                 identifierTokens,
-                () => DeliveryClient.GetContentElementAsync(contentTypeCodename, contentElementCodename),
+                () => _deliveryClient.GetContentElementAsync(contentTypeCodename, contentElementCodename),
                 response => response == null,
                 GetContentElementDependencies);
         }
@@ -299,9 +295,9 @@ namespace VERSUS.Kentico.Services
         {
             var identifierTokens = new List<string> { KenticoCloudCacheHelper.TAXONOMY_GROUP_SINGLE_JSON_IDENTIFIER, codename };
 
-            return await CacheManager.GetOrCreateAsync(
+            return await _cacheManager.GetOrCreateAsync(
                 identifierTokens,
-                () => DeliveryClient.GetTaxonomyJsonAsync(codename),
+                () => _deliveryClient.GetTaxonomyJsonAsync(codename),
                 response => response == null,
                 GetTaxonomySingleJsonDependency);
         }
@@ -316,9 +312,9 @@ namespace VERSUS.Kentico.Services
             var identifierTokens = new List<string> { KenticoCloudCacheHelper.TAXONOMY_GROUP_LISTING_JSON_IDENTIFIER };
             identifierTokens.AddNonNullRange(parameters);
 
-            return await CacheManager.GetOrCreateAsync(
+            return await _cacheManager.GetOrCreateAsync(
                 identifierTokens,
-                () => DeliveryClient.GetTaxonomiesJsonAsync(parameters),
+                () => _deliveryClient.GetTaxonomiesJsonAsync(parameters),
                 response => response["taxonomies"].Count() <= 0,
                 GetTaxonomyListingJsonDependencies);
         }
@@ -332,9 +328,9 @@ namespace VERSUS.Kentico.Services
         {
             var identifierTokens = new List<string> { KenticoCloudCacheHelper.TAXONOMY_GROUP_SINGLE_IDENTIFIER, codename };
 
-            return await CacheManager.GetOrCreateAsync(
+            return await _cacheManager.GetOrCreateAsync(
                 identifierTokens,
-                () => DeliveryClient.GetTaxonomyAsync(codename),
+                () => _deliveryClient.GetTaxonomyAsync(codename),
                 response => response == null,
                 GetTaxonomySingleDependency);
         }
@@ -359,9 +355,9 @@ namespace VERSUS.Kentico.Services
             var identifierTokens = new List<string> { KenticoCloudCacheHelper.TAXONOMY_GROUP_LISTING_IDENTIFIER };
             identifierTokens.AddNonNullRange(KenticoCloudCacheHelper.GetIdentifiersFromParameters(parameters));
 
-            return await CacheManager.GetOrCreateAsync(
+            return await _cacheManager.GetOrCreateAsync(
                 identifierTokens,
-                () => DeliveryClient.GetTaxonomiesAsync(parameters),
+                () => _deliveryClient.GetTaxonomiesAsync(parameters),
                 response => response.Taxonomies.Count <= 0,
                 GetTaxonomyListingDependencies);
         }
@@ -643,7 +639,7 @@ namespace VERSUS.Kentico.Services
                     GetDependentIdentifierPairs(
                         typeName, codeName, cacheTokenPair =>
                         {
-                            return CacheManager.GetDependenciesFromCache<ContentType>(cacheTokenPair, cachedContentType =>
+                            return _cacheManager.GetDependenciesFromCache<ContentType>(cacheTokenPair, cachedContentType =>
                             {
                                 var dependenciesPerCacheEntry = new List<CacheTokenPair>();
 

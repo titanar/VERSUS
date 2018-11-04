@@ -1,15 +1,13 @@
 ﻿using KenticoCloud.Delivery;
-
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-
 using VERSUS.Core;
-using VERSUS.Kentico.Areas.WebHooks.Services;
-using VERSUS.Kentico.Filters;
+using VERSUS.Kentico.Middleware;
 using VERSUS.Kentico.Providers;
 using VERSUS.Kentico.Services;
+using VERSUS.Kentico.Webhooks.Services;
 
 namespace VERSUS.Kentico.Extensions
 {
@@ -24,7 +22,7 @@ namespace VERSUS.Kentico.Extensions
                         sp.GetRequiredService<IMemoryCache>())
                     )
                     .AddSingleton<IWebhookListener>(sp => new WebhookListener(sp.GetRequiredService<ICacheManager>()))
-                    .AddScoped<KenticoCloudSignatureActionFilter>()
+                    .AddTransient<WebhookMiddleware>()
 
                     .AddSingleton<IDeliveryClient>(sp => new CachedDeliveryClient(
                         sp.GetRequiredService<ICacheManager>(),

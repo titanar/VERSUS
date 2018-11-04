@@ -4,14 +4,12 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
-
 using VERSUS.Core;
-using VERSUS.Kentico.Areas.WebHooks.Models;
 using VERSUS.Kentico.Helpers;
+using VERSUS.Kentico.Webhooks.Models;
 
 namespace VERSUS.Kentico.Services
 {

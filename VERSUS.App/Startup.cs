@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 
 using KenticoCloud.Delivery;
 
@@ -16,7 +15,6 @@ using VERSUS.App.Resolvers;
 using VERSUS.Core;
 using VERSUS.Core.Extensions;
 using VERSUS.Infrastructure.Extensions;
-using VERSUS.Kentico.Areas.WebHooks.Controllers;
 using VERSUS.Kentico.Extensions;
 
 namespace VERSUS.App
@@ -64,9 +62,7 @@ namespace VERSUS.App
 
                     .AddReactServices()
 
-                    .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest)
-
-                    .AddApplicationPart(typeof(KenticoCloudController).GetTypeInfo().Assembly).AddControllersAsServices();
+                    .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest);
 
             return services.BuildServiceProvider();
         }
@@ -91,24 +87,21 @@ namespace VERSUS.App
 
             // Initialize ReactJS.NET. Must be before static files.
             app.UseReact(config =>
-            {
-                // Server-side rendering of React components. Babel and React are provided manually.
-                config
-                    .SetReuseJavaScriptEngines(true)
-                    .SetLoadBabel(false)
-                    .SetLoadReact(false)
-                    .AddScriptWithoutTransform("/js/versus.js");
-            })
+                {
+                    // Server-side rendering of React components. Babel and React are provided manually.
+                    config
+                        .SetReuseJavaScriptEngines(true)
+                        .SetLoadBabel(false)
+                        .SetLoadReact(false)
+                        .AddScriptWithoutTransform("/js/versus.js");
+                })
 
                 .UseStaticFiles()
                 .UseCookiePolicy()
 
-                .UseMvc(routes =>
-                {
-                    routes.MapRoute(
-                        name: "areas",
-                        template: "{area:exists}/{controller}/{action=Index}");
-                });
+                .UseWebhookMiddleware()
+
+                .UseMvc();
         }
     }
 }

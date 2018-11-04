@@ -1,4 +1,4 @@
-﻿namespace VERSUS.Kentico.Areas.WebHooks.Models
+﻿namespace VERSUS.Kentico.Webhooks.Models
 {
     public interface IWebhookCodenamedData
     {

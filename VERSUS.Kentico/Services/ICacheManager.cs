@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using VERSUS.Kentico.Areas.WebHooks.Models;
+using VERSUS.Kentico.Webhooks.Models;
 
 namespace VERSUS.Kentico.Services
 {
