@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+
 using VERSUS.Core;
 using VERSUS.Kentico.Helpers;
-using VERSUS.Kentico.Webhooks.Models;
+using VERSUS.Kentico.Services.Models;
 
 namespace VERSUS.Kentico.Services
 {
@@ -112,16 +114,11 @@ namespace VERSUS.Kentico.Services
         /// Invalidates (clears) a cache entry.
         /// </summary>
         /// <param name="cacheTokenPair">Identifiers of the entry.</param>
-        public void InvalidateEntry(CacheTokenPair cacheTokenPair)
+        public void InvalidateEntry(string typeName, string codename)
         {
-            if (cacheTokenPair == null)
+            foreach (var dependentTypeName in KenticoCloudCacheHelper.GetDependentTypeNames(typeName))
             {
-                throw new ArgumentNullException(nameof(cacheTokenPair));
-            }
-
-            foreach (var dependentTypeName in KenticoCloudCacheHelper.GetDependentTypeNames(cacheTokenPair.TypeName))
-            {
-                if (_memoryCache.TryGetValue(string.Join("|", DUMMY_IDENTIFIER, dependentTypeName, cacheTokenPair.Codename), out CancellationTokenSource dummyEntry))
+                if (_memoryCache.TryGetValue(string.Join("|", DUMMY_IDENTIFIER, dependentTypeName, codename), out CancellationTokenSource dummyEntry))
                 {
                     // Mark all subscribers to the CancellationTokenSource as invalid.
                     dummyEntry.Cancel();
@@ -139,7 +136,7 @@ namespace VERSUS.Kentico.Services
         public IEnumerable<CacheTokenPair> GetDependenciesFromCache<T>(CacheTokenPair cacheIdentifierPair, Func<T, IEnumerable<CacheTokenPair>> dependencyFactory)
             where T : class
         {
-            if (_memoryCache.TryGetValue(string.Join("|", cacheIdentifierPair.TypeName, cacheIdentifierPair.Codename), out T cacheEntry))
+            if (TryGetValue(new[] { cacheIdentifierPair.TypeName, cacheIdentifierPair.Codename }, out T cacheEntry))
             {
                 return dependencyFactory(cacheEntry);
             }
@@ -179,7 +176,7 @@ namespace VERSUS.Kentico.Services
 
             foreach (var dependency in dependencies)
             {
-                var dummyKeyTokens = new List<string> { DUMMY_IDENTIFIER, dependency.TypeName, dependency.Codename };
+                var dummyKeyTokens = new[] { DUMMY_IDENTIFIER, dependency.TypeName, dependency.Codename };
                 var dummyKey = string.Join("|", dummyKeyTokens);
                 var newDummyLock = new object();
                 object dummyLock;

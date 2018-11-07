@@ -17,6 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="JavaScriptEngineSwitcher.ChakraCore" Version="3.0.0-rc1" />
+    <PackageReference Include="JavaScriptEngineSwitcher.ChakraCore.Native.win-x64" Version="3.0.0-rc1" />
+    <PackageReference Include="JavaScriptEngineSwitcher.Extensions.MsDependencyInjection" Version="3.0.0-rc1" />
     <PackageReference Include="KenticoCloud.Delivery.Rx" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0-preview3-35497" />
@@ -26,6 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\VERSUS.Infrastructure\VERSUS.Infrastructure.csproj" />
     <ProjectReference Include="..\VERSUS.Kentico.Models\VERSUS.Kentico.Models.csproj" />
+    <ProjectReference Include="..\VERSUS.Kentico.Webhooks\VERSUS.Kentico.Webhooks.csproj" />
     <ProjectReference Include="..\VERSUS.Kentico\VERSUS.Kentico.csproj" />
   </ItemGroup>
 

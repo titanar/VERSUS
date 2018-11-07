@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using VERSUS.Kentico.Webhooks.Models;
+using VERSUS.Kentico.Services.Models;
 
 namespace VERSUS.Kentico.Services
 {
@@ -33,8 +33,8 @@ namespace VERSUS.Kentico.Services
         /// <summary>
         /// Invalidates (clears) a cache entry.
         /// </summary>
-        /// <param name="identifiers">Identifiers of the entry.</param>
-        void InvalidateEntry(CacheTokenPair identifiers);
+        /// <param name="cacheTokenPair">Identifiers of the entry.</param>
+        void InvalidateEntry(string typeName, string codename);
 
         /// <summary>
         /// Looks up the cache for an entry and passes it to <paramref name="dependencyFactory"/> that extracts specific dependencies.

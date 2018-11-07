@@ -1,6 +1,7 @@
 ﻿using System;
 
-using KenticoCloud.Delivery;
+using JavaScriptEngineSwitcher.ChakraCore;
+using JavaScriptEngineSwitcher.Extensions.MsDependencyInjection;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,11 +12,10 @@ using Microsoft.Extensions.Options;
 
 using React.AspNet;
 
-using VERSUS.App.Resolvers;
 using VERSUS.Core;
-using VERSUS.Core.Extensions;
 using VERSUS.Infrastructure.Extensions;
 using VERSUS.Kentico.Extensions;
+using VERSUS.Kentico.Webhooks.Extensions;
 
 namespace VERSUS.App
 {
@@ -56,13 +56,16 @@ namespace VERSUS.App
                         options.CheckConsentNeeded = context => true;
                     })
 
-                    .AddSingleton<IContentLinkUrlResolver>(_ => new VersusContentLinkUrlResolver())
-
                     .AddKenticoDelivery(Configuration)
 
-                    .AddReactServices()
+                    .AddKenticoWebhooks();
 
-                    .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest);
+            services.AddHttpContextAccessor()
+                    .AddReact()
+                    .AddJsEngineSwitcher(options => options.DefaultEngineName = ChakraCoreJsEngine.EngineName)
+                    .AddChakraCore();
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest);
 
             return services.BuildServiceProvider();
         }
@@ -71,7 +74,9 @@ namespace VERSUS.App
         public void Configure(IApplicationBuilder app, IOptionsSnapshot<VersusOptions> options)
         {
             app.UseHttpsRedirection()
-                .UseStatusCodePagesWithReExecute(options.Value.ErrorHandlingRoute + "/{0}");
+                .UseWebhookMiddleware(options.Value.KenticoCloudWebhookEndpoint)
+                .UseStatusCodePagesWithReExecute($"{options.Value.ErrorHandlingRoute}/{{0}}")
+                .UseSignalR();
 
             if (Environment.IsDevelopment())
             {
@@ -98,8 +103,6 @@ namespace VERSUS.App
 
                 .UseStaticFiles()
                 .UseCookiePolicy()
-
-                .UseWebhookMiddleware()
 
                 .UseMvc();
         }

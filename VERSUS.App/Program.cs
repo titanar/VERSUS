@@ -13,8 +13,8 @@ namespace VERSUS.App
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
             return WebHost.CreateDefaultBuilder(args)
-.CaptureStartupErrors(true)
-.UseStartup<Startup>();
+                    .CaptureStartupErrors(true)
+                    .UseStartup<Startup>();
         }
     }
 }

@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using KenticoCloud.Delivery;
 using KenticoCloud.Delivery.InlineContentItems;
+
 using Newtonsoft.Json.Linq;
+
 using VERSUS.Core.Extensions;
 using VERSUS.Kentico.Helpers;
-using VERSUS.Kentico.Webhooks.Models;
+using VERSUS.Kentico.Services.Models;
 
 namespace VERSUS.Kentico.Services
 {
@@ -554,11 +557,11 @@ namespace VERSUS.Kentico.Services
             return response?[KenticoCloudCacheHelper.TYPES_IDENTIFIER]?.SelectMany(t => GetTypeSingleJsonDependencies(t.ToObject<JObject>())).Distinct();
         }
 
-        private IEnumerable<CacheTokenPair> GetDependentIdentifierPairs(string typeName, string codename, Func<CacheTokenPair, IEnumerable<CacheTokenPair>> dependencyFactory)
+        private IEnumerable<CacheTokenPair> GetDependentTokenPairs(string typeName, string codename, Func<CacheTokenPair, IEnumerable<CacheTokenPair>> dependencyFactory)
         {
             foreach (var dependentTypeName in KenticoCloudCacheHelper.GetDependentTypeNames(typeName))
             {
-                return dependencyFactory(new CacheTokenPair { TypeName = dependentTypeName, Codename = codename });
+                return dependencyFactory(new CacheTokenPair(dependentTypeName, codename));
             }
 
             return null;
@@ -573,9 +576,8 @@ namespace VERSUS.Kentico.Services
             {
                 // Dependency on all formats of the item.
                 dependencies.AddNonNullRange(
-                    GetDependentIdentifierPairs(KenticoCloudCacheHelper.CONTENT_ITEM_SINGLE_IDENTIFIER, extractedItemCodename, identifierSet =>
-                        Enumerable.Repeat(identifierSet, 1)
-                    ));
+                    GetDependentTokenPairs(KenticoCloudCacheHelper.CONTENT_ITEM_SINGLE_IDENTIFIER, extractedItemCodename, cacheTokenPair => new[] { cacheTokenPair }
+                ));
 
                 // Dependency on elements of item's type (if possible).
                 dependencies.AddNonNullRange(GetContentTypeDependencies(KenticoCloudCacheHelper.CONTENT_TYPE_SINGLE_IDENTIFIER, extractedTypeCodename));
@@ -592,11 +594,10 @@ namespace VERSUS.Kentico.Services
             return dependencies;
         }
 
-        private IEnumerable<CacheTokenPair> GetTaxonomyDependencies(string originalFormatIdentifier, string taxonomyCodename)
+        private IEnumerable<CacheTokenPair> GetTaxonomyDependencies(string typeName, string taxonomyCodename)
         {
-            return GetDependentIdentifierPairs(
-                originalFormatIdentifier, taxonomyCodename, identifierSet =>
-                    Enumerable.Repeat(identifierSet, 1)
+            return GetDependentTokenPairs(
+                typeName, taxonomyCodename, cacheTokenPair => new[] { cacheTokenPair }
             );
         }
 
@@ -605,8 +606,7 @@ namespace VERSUS.Kentico.Services
             var dependencies = new List<CacheTokenPair>();
 
             dependencies.AddNonNullRange(
-                GetDependentIdentifierPairs(typeName, codeName, identifierSet =>
-                    Enumerable.Repeat(identifierSet, 1)
+                GetDependentTokenPairs(typeName, codeName, cacheTokenPair => new[] { cacheTokenPair }
                 ));
 
             // Try to get element codenames from the response.
@@ -636,7 +636,7 @@ namespace VERSUS.Kentico.Services
             else
             {
                 dependencies.AddNonNullRange(
-                    GetDependentIdentifierPairs(
+                    GetDependentTokenPairs(
                         typeName, codeName, cacheTokenPair =>
                         {
                             return _cacheManager.GetDependenciesFromCache<ContentType>(cacheTokenPair, cachedContentType =>
@@ -650,11 +650,7 @@ namespace VERSUS.Kentico.Services
 
                                 if (!string.IsNullOrEmpty(cacheTokenPair.TypeName))
                                 {
-                                    dependenciesPerCacheEntry.Add(new CacheTokenPair
-                                    {
-                                        TypeName = cacheTokenPair.TypeName,
-                                        Codename = cachedContentType.System?.Codename
-                                    });
+                                    dependenciesPerCacheEntry.Add(new CacheTokenPair(cacheTokenPair.TypeName, cachedContentType.System?.Codename));
                                 }
 
                                 return dependenciesPerCacheEntry;
@@ -666,7 +662,7 @@ namespace VERSUS.Kentico.Services
             return dependencies;
         }
 
-        private IEnumerable<CacheTokenPair> GetContentElementDependenciesInternal(string originalFormatIdentifier, dynamic response)
+        private IEnumerable<CacheTokenPair> GetContentElementDependenciesInternal(string typeName, dynamic response)
         {
             var dependencies = new List<CacheTokenPair>();
             string elementCodename = null;
@@ -686,15 +682,11 @@ namespace VERSUS.Kentico.Services
             if (!string.IsNullOrEmpty(elementType) && !string.IsNullOrEmpty(elementCodename))
             {
                 dependencies.AddNonNullRange(
-                    GetDependentIdentifierPairs(
-                        originalFormatIdentifier, elementCodename, cacheTokenPair =>
-                            new List<CacheTokenPair>
+                    GetDependentTokenPairs(
+                        typeName, elementCodename, cacheTokenPair =>
+                            new[]
                             {
-                                new CacheTokenPair
-                                {
-                                    TypeName = cacheTokenPair.TypeName,
-                                    Codename = string.Join("|", elementType, elementCodename)
-                                }
+                                new CacheTokenPair(cacheTokenPair.TypeName, string.Join("|", elementType, elementCodename))
                             }
                 ));
             }

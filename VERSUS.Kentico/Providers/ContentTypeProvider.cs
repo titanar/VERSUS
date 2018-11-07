@@ -6,7 +6,7 @@ using KenticoCloud.Delivery;
 
 namespace VERSUS.Kentico.Providers
 {
-    public class VersusTypeProvider : ICodeFirstTypeProvider
+    public class ContentTypeProvider : ICodeFirstTypeProvider
     {
         private static readonly HashSet<(Type, string)> codenames = new HashSet<(Type, string)>(
                                                                             AppDomain.CurrentDomain.GetAssemblies()

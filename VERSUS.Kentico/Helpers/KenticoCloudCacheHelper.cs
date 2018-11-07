@@ -122,16 +122,6 @@ namespace VERSUS.Kentico.Helpers
             TAXONOMY_GROUP_LISTING_JSON_IDENTIFIER
         };
 
-        public static List<string> InvalidatingOperations => new List<string>
-        {
-            "upsert",
-            "publish",
-            "restore_publish",
-            "unpublish",
-            "archive",
-            "restore"
-        };
-
         #endregion Properties
 
         #region Public methods

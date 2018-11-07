@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 using VERSUS.Core;
+using VERSUS.Infrastructure.Services;
 
 namespace VERSUS.Infrastructure.Extensions
 {
@@ -19,13 +20,16 @@ namespace VERSUS.Infrastructure.Extensions
 
             ObservableExtensions.DefaultTimeout = TimeSpan.FromSeconds(versusOptions.CommandTimeout);
 
-            services.AddDbContextPool<DbContext>(
+            services.AddDbContextPool<SiteDbContext>(
                 options => options
                             .UseSqlServer(
                                     versusOptions.ConnectionString,
 
                                     // Retry with some safe SQL exceptions
                                     x => x.EnableRetryOnFailure()
+
+                                    // Set assembly with DbContext classes
+                                    .MigrationsAssembly("VERSUS.Infrastructure")
 
                                     //Set command timeout
                                     .CommandTimeout(versusOptions.CommandTimeout))
@@ -37,7 +41,11 @@ namespace VERSUS.Infrastructure.Extensions
                             .EnableSensitiveDataLogging(env.IsDevelopment())
 
                             // Turn off tracking by default
-                            .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+                            .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking))
+
+                     .AddScoped<IReviewService, ReviewService>()
+
+                     .AddSignalR();
 
             return services;
         }

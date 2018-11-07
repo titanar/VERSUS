@@ -16,6 +16,10 @@
 
                 @Html.React("Components.SiteTest", Model)
             </li>
+            @foreach (VERSUS.Infrastructure.Models.Review review in ViewBag.Reviews)
+            {
+                <li>@review.Content</li>
+            }
         </ul>
     </div>
 </div>

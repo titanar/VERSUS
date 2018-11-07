@@ -1,16 +1,22 @@
 ﻿using KenticoCloud.Delivery;
 
-namespace VERSUS.App.Resolvers
+using Microsoft.Extensions.Options;
+
+using VERSUS.Core;
+
+namespace VERSUS.Kentico.Providers
 {
-    public class VersusContentLinkUrlResolver : IContentLinkUrlResolver
+    public class ContentLinkUrlResolver : IContentLinkUrlResolver
     {
+        private readonly IOptionsSnapshot<VersusOptions> _versusOptions;
+
         /// <summary>
         /// Resolves a broken link URL.
         /// </summary>
         /// <returns>A relative URL to the site's 404 page.</returns>
         public string ResolveBrokenLinkUrl()
         {
-            return "/Error/404";
+            return $"{_versusOptions.Value.ErrorHandlingRoute}/404";
         }
 
         /// <summary>
@@ -20,7 +26,12 @@ namespace VERSUS.App.Resolvers
         /// <returns>A relative URL to the page where the content is displayed.</returns>
 		public string ResolveLinkUrl(ContentLink link)
         {
-            return $"/{link.UrlSlug}";
+            return $"{_versusOptions.Value.KenticoCloudUrlSlugEndpoint}/{link.UrlSlug}";
+        }
+
+        public ContentLinkUrlResolver(IOptionsSnapshot<VersusOptions> versusOptions)
+        {
+            _versusOptions = versusOptions;
         }
     }
 }
