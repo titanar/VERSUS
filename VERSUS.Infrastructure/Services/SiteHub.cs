@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 
 namespace VERSUS.Infrastructure.Services
 {
@@ -8,15 +6,15 @@ namespace VERSUS.Infrastructure.Services
     {
         private readonly IReviewService _reviewService;
 
-        public async Task SendMessage(string message)
-        {
-            await Clients.All.SendAsync("displaymessage", message);
-        }
-
         public SiteHub(IReviewService reviewService)
         {
             _reviewService = reviewService;
         }
+
+        //public async Task SendMessage(string message)
+        //{
+        //    await Clients.All.SendAsync("displaymessage", message);
+        //}
 
         public string ReturnSomething(SiteViewModel siteViewModel)
         {

@@ -17,15 +17,19 @@ namespace VERSUS.Kentico.Extensions
             services.Configure<DeliveryOptions>(configuration)
 
                     .AddSingleton<ICacheManager, CacheManager>()
-                    .AddSingleton<IContentLinkUrlResolver, ContentLinkUrlResolver>()
+                    .AddTransient<ICodeFirstTypeProvider, ContentTypeProvider>()
+                    .AddTransient<IContentLinkUrlResolver, ContentLinkUrlResolver>()
 
-                    .AddSingleton<IDeliveryClient>(sp =>
-                    new CachedDeliveryClient(sp.GetRequiredService<ICacheManager>(),
-                        new DeliveryClient(sp.GetRequiredService<IOptionsSnapshot<DeliveryOptions>>().Value))
-                    {
-                        CodeFirstModelProvider = { TypeProvider = new ContentTypeProvider() },
-                        ContentLinkUrlResolver = sp.GetRequiredService<IContentLinkUrlResolver>()
-                    });
+                    .AddDeliveryClient(configuration)
+
+                    .AddSingleton<IDeliveryClient>(sp => new CachedDeliveryClient(
+                          sp.GetRequiredService<ICacheManager>(),
+                         DeliveryClientBuilder
+                             .WithOptions(_ => sp.GetRequiredService<IOptionsSnapshot<DeliveryOptions>>().Value)
+                             .WithCodeFirstTypeProvider(sp.GetRequiredService<ICodeFirstTypeProvider>())
+                             .WithContentLinkUrlResolver(sp.GetRequiredService<IContentLinkUrlResolver>())
+                             .Build()
+                     ));
 
             var sericeProvider = services.BuildServiceProvider();
             var versusOptions = sericeProvider.GetRequiredService<IOptionsSnapshot<VersusOptions>>().Value;

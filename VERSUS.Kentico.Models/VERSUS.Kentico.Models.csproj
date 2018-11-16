@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="KenticoCloud.Delivery.Rx" Version="7.0.0" />
+    <PackageReference Include="KenticoCloud.Delivery.Rx" Version="8.0.0" />
   </ItemGroup>
 
 </Project>

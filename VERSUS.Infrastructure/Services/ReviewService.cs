@@ -17,11 +17,12 @@ namespace VERSUS.Infrastructure.Services
 
         public Review AddReview(string content)
         {
-            var review = _dbContext.Reviews.Add(new Review
+            var review = new Review
             {
                 Content = content
-            }).Entity;
+            };
 
+            _dbContext.Add(review);
             _dbContext.SaveChanges();
 
             return review;

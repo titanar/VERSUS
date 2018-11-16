@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using KenticoCloud.Delivery;
-using KenticoCloud.Delivery.InlineContentItems;
 
 using Newtonsoft.Json.Linq;
 
@@ -18,24 +17,6 @@ namespace VERSUS.Kentico.Services
     {
         private ICacheManager _cacheManager;
         private IDeliveryClient _deliveryClient;
-
-        #region Properties
-
-        public IContentLinkUrlResolver ContentLinkUrlResolver
-        {
-            get => _deliveryClient.ContentLinkUrlResolver;
-            set => _deliveryClient.ContentLinkUrlResolver = value;
-        }
-
-        public ICodeFirstModelProvider CodeFirstModelProvider
-        {
-            get => _deliveryClient.CodeFirstModelProvider;
-            set => _deliveryClient.CodeFirstModelProvider = value;
-        }
-
-        public IInlineContentItemsProcessor InlineContentItemsProcessor => _deliveryClient.InlineContentItemsProcessor;
-
-        #endregion Properties
 
         #region Constructors
 
@@ -57,14 +38,14 @@ namespace VERSUS.Kentico.Services
         /// <returns>The <see cref="JObject"/> instance that represents the content item with the specified codename.</returns>
         public async Task<JObject> GetItemJsonAsync(string codename, params string[] parameters)
         {
-            var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ITEM_SINGLE_JSON_IDENTIFIER, codename };
-            identifierTokens.AddNonNullRange(parameters);
+            var cacheTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ITEM_SINGLE_JSON_IDENTIFIER, codename };
+            cacheTokens.AddNonNullRange(parameters);
 
             return await _cacheManager.GetOrCreateAsync(
-                identifierTokens,
+                cacheTokens,
                 () => _deliveryClient.GetItemJsonAsync(codename, parameters),
                 response => response == null,
-                GetContentItemSingleJsonDependencies);
+                GetItemJsonResponseDependencies);
         }
 
         /// <summary>
@@ -74,14 +55,14 @@ namespace VERSUS.Kentico.Services
         /// <returns>The <see cref="JObject"/> instance that represents the content items. If no query parameters are specified, all content items are returned.</returns>
         public async Task<JObject> GetItemsJsonAsync(params string[] parameters)
         {
-            var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ITEM_LISTING_JSON_IDENTIFIER };
-            identifierTokens.AddNonNullRange(parameters);
+            var cacheTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ITEM_LISTING_JSON_IDENTIFIER };
+            cacheTokens.AddNonNullRange(parameters);
 
             return await _cacheManager.GetOrCreateAsync(
-                identifierTokens,
+                cacheTokens,
                 () => _deliveryClient.GetItemsJsonAsync(parameters),
                 response => response["items"].Count() <= 0,
-                GetContentItemListingJsonDependencies);
+                GetItemListingJsonResponseDependencies);
         }
 
         /// <summary>
@@ -115,14 +96,14 @@ namespace VERSUS.Kentico.Services
         /// <returns>The <see cref="DeliveryItemResponse"/> instance that contains the content item with the specified codename.</returns>
         public async Task<DeliveryItemResponse> GetItemAsync(string codename, IEnumerable<IQueryParameter> parameters)
         {
-            var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ITEM_SINGLE_IDENTIFIER, codename };
-            identifierTokens.AddNonNullRange(KenticoCloudCacheHelper.GetIdentifiersFromParameters(parameters));
+            var cacheTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ITEM_SINGLE_IDENTIFIER, codename };
+            cacheTokens.AddNonNullRange(KenticoCloudCacheHelper.GetIdentifiersFromParameters(parameters));
 
             return await _cacheManager.GetOrCreateAsync(
-                identifierTokens,
+                cacheTokens,
                 () => _deliveryClient.GetItemAsync(codename, parameters),
                 response => response == null,
-                GetContentItemSingleDependencies);
+                GetItemResponseDependencies);
         }
 
         /// <summary>
@@ -134,14 +115,14 @@ namespace VERSUS.Kentico.Services
         /// <returns>The <see cref="DeliveryItemResponse{T}"/> instance that contains the content item with the specified codename.</returns>
         public async Task<DeliveryItemResponse<T>> GetItemAsync<T>(string codename, IEnumerable<IQueryParameter> parameters = null)
         {
-            var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ITEM_SINGLE_TYPED_IDENTIFIER, codename };
-            identifierTokens.AddNonNullRange(KenticoCloudCacheHelper.GetIdentifiersFromParameters(parameters));
+            var cacheTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ITEM_SINGLE_TYPED_IDENTIFIER, codename };
+            cacheTokens.AddNonNullRange(KenticoCloudCacheHelper.GetIdentifiersFromParameters(parameters));
 
             return await _cacheManager.GetOrCreateAsync(
-                identifierTokens,
+                cacheTokens,
                 () => _deliveryClient.GetItemAsync<T>(codename, parameters),
                 response => response == null,
-                GetContentItemSingleDependencies);
+                GetItemResponseDependencies);
         }
 
         /// <summary>
@@ -162,14 +143,14 @@ namespace VERSUS.Kentico.Services
         /// <returns>The <see cref="DeliveryItemListingResponse"/> instance that contains the content items. If no query parameters are specified, all content items are returned.</returns>
         public async Task<DeliveryItemListingResponse> GetItemsAsync(IEnumerable<IQueryParameter> parameters)
         {
-            var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ITEM_LISTING_IDENTIFIER };
-            identifierTokens.AddNonNullRange(KenticoCloudCacheHelper.GetIdentifiersFromParameters(parameters));
+            var cacheTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ITEM_LISTING_IDENTIFIER };
+            cacheTokens.AddNonNullRange(KenticoCloudCacheHelper.GetIdentifiersFromParameters(parameters));
 
             return await _cacheManager.GetOrCreateAsync(
-                identifierTokens,
+                cacheTokens,
                 () => _deliveryClient.GetItemsAsync(parameters),
                 response => response.Items.Count <= 0,
-                GetContentItemListingDependencies);
+                GetItemListingResponseDependencies);
         }
 
         /// <summary>
@@ -186,14 +167,14 @@ namespace VERSUS.Kentico.Services
 
         public async Task<DeliveryItemListingResponse<T>> GetItemsAsync<T>(IEnumerable<IQueryParameter> parameters)
         {
-            var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ITEM_LISTING_TYPED_IDENTIFIER };
-            identifierTokens.AddNonNullRange(KenticoCloudCacheHelper.GetIdentifiersFromParameters(parameters));
+            var cacheTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ITEM_LISTING_TYPED_IDENTIFIER };
+            cacheTokens.AddNonNullRange(KenticoCloudCacheHelper.GetIdentifiersFromParameters(parameters));
 
             return await _cacheManager.GetOrCreateAsync(
-                identifierTokens,
+                cacheTokens,
                 () => _deliveryClient.GetItemsAsync<T>(parameters),
                 response => response.Items.Count <= 0,
-                GetContentItemListingDependencies);
+                GetItemListingResponseDependencies);
         }
 
         /// <summary>
@@ -203,10 +184,10 @@ namespace VERSUS.Kentico.Services
         /// <returns>The <see cref="JObject"/> instance that represents the content type with the specified codename.</returns>
         public async Task<JObject> GetTypeJsonAsync(string codename)
         {
-            var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_TYPE_SINGLE_JSON_IDENTIFIER, codename };
+            var cacheTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_TYPE_SINGLE_JSON_IDENTIFIER, codename };
 
             return await _cacheManager.GetOrCreateAsync(
-                identifierTokens,
+                cacheTokens,
                 () => _deliveryClient.GetTypeJsonAsync(codename),
                 response => response == null,
                 GetTypeSingleJsonDependencies);
@@ -219,11 +200,11 @@ namespace VERSUS.Kentico.Services
         /// <returns>The <see cref="JObject"/> instance that represents the content types. If no query parameters are specified, all content types are returned.</returns>
         public async Task<JObject> GetTypesJsonAsync(params string[] parameters)
         {
-            var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_TYPE_LISTING_JSON_IDENTIFIER };
-            identifierTokens.AddNonNullRange(parameters);
+            var cacheTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_TYPE_LISTING_JSON_IDENTIFIER };
+            cacheTokens.AddNonNullRange(parameters);
 
             return await _cacheManager.GetOrCreateAsync(
-                identifierTokens,
+                cacheTokens,
                 () => _deliveryClient.GetTypesJsonAsync(parameters),
                 response => response["types"].Count() <= 0,
                 GetTypeListingJsonDependencies);
@@ -236,10 +217,10 @@ namespace VERSUS.Kentico.Services
         /// <returns>The content type with the specified codename.</returns>
         public async Task<ContentType> GetTypeAsync(string codename)
         {
-            var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_TYPE_SINGLE_IDENTIFIER, codename };
+            var cacheTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_TYPE_SINGLE_IDENTIFIER, codename };
 
             return await _cacheManager.GetOrCreateAsync(
-                identifierTokens,
+                cacheTokens,
                 () => _deliveryClient.GetTypeAsync(codename),
                 response => response == null,
                 GetTypeSingleDependencies);
@@ -262,11 +243,11 @@ namespace VERSUS.Kentico.Services
         /// <returns>The <see cref="DeliveryTypeListingResponse"/> instance that represents the content types. If no query parameters are specified, all content types are returned.</returns>
         public async Task<DeliveryTypeListingResponse> GetTypesAsync(IEnumerable<IQueryParameter> parameters)
         {
-            var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_TYPE_LISTING_IDENTIFIER };
-            identifierTokens.AddNonNullRange(KenticoCloudCacheHelper.GetIdentifiersFromParameters(parameters));
+            var cacheTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_TYPE_LISTING_IDENTIFIER };
+            cacheTokens.AddNonNullRange(KenticoCloudCacheHelper.GetIdentifiersFromParameters(parameters));
 
             return await _cacheManager.GetOrCreateAsync(
-                identifierTokens,
+                cacheTokens,
                 () => _deliveryClient.GetTypesAsync(parameters),
                 response => response.Types.Count <= 0,
                 GetTypeListingDependencies);
@@ -280,10 +261,10 @@ namespace VERSUS.Kentico.Services
         /// <returns>A content element with the specified codename that is a part of a content type with the specified codename.</returns>
         public async Task<ContentElement> GetContentElementAsync(string contentTypeCodename, string contentElementCodename)
         {
-            var identifierTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ELEMENT_IDENTIFIER, contentTypeCodename, contentElementCodename };
+            var cacheTokens = new List<string> { KenticoCloudCacheHelper.CONTENT_ELEMENT_IDENTIFIER, contentTypeCodename, contentElementCodename };
 
             return await _cacheManager.GetOrCreateAsync(
-                identifierTokens,
+                cacheTokens,
                 () => _deliveryClient.GetContentElementAsync(contentTypeCodename, contentElementCodename),
                 response => response == null,
                 GetContentElementDependencies);
@@ -296,10 +277,10 @@ namespace VERSUS.Kentico.Services
         /// <returns>The <see cref="JObject"/> instance that represents the taxonomy group with the specified codename.</returns>
         public async Task<JObject> GetTaxonomyJsonAsync(string codename)
         {
-            var identifierTokens = new List<string> { KenticoCloudCacheHelper.TAXONOMY_GROUP_SINGLE_JSON_IDENTIFIER, codename };
+            var cacheTokens = new List<string> { KenticoCloudCacheHelper.TAXONOMY_GROUP_SINGLE_JSON_IDENTIFIER, codename };
 
             return await _cacheManager.GetOrCreateAsync(
-                identifierTokens,
+                cacheTokens,
                 () => _deliveryClient.GetTaxonomyJsonAsync(codename),
                 response => response == null,
                 GetTaxonomySingleJsonDependency);
@@ -312,11 +293,11 @@ namespace VERSUS.Kentico.Services
         /// <returns>The <see cref="JObject"/> instance that represents the taxonomy groups. If no query parameters are specified, all taxonomy groups are returned.</returns>
         public async Task<JObject> GetTaxonomiesJsonAsync(params string[] parameters)
         {
-            var identifierTokens = new List<string> { KenticoCloudCacheHelper.TAXONOMY_GROUP_LISTING_JSON_IDENTIFIER };
-            identifierTokens.AddNonNullRange(parameters);
+            var cacheTokens = new List<string> { KenticoCloudCacheHelper.TAXONOMY_GROUP_LISTING_JSON_IDENTIFIER };
+            cacheTokens.AddNonNullRange(parameters);
 
             return await _cacheManager.GetOrCreateAsync(
-                identifierTokens,
+                cacheTokens,
                 () => _deliveryClient.GetTaxonomiesJsonAsync(parameters),
                 response => response["taxonomies"].Count() <= 0,
                 GetTaxonomyListingJsonDependencies);
@@ -329,10 +310,10 @@ namespace VERSUS.Kentico.Services
         /// <returns>The taxonomy group with the specified codename.</returns>
         public async Task<TaxonomyGroup> GetTaxonomyAsync(string codename)
         {
-            var identifierTokens = new List<string> { KenticoCloudCacheHelper.TAXONOMY_GROUP_SINGLE_IDENTIFIER, codename };
+            var cacheTokens = new List<string> { KenticoCloudCacheHelper.TAXONOMY_GROUP_SINGLE_IDENTIFIER, codename };
 
             return await _cacheManager.GetOrCreateAsync(
-                identifierTokens,
+                cacheTokens,
                 () => _deliveryClient.GetTaxonomyAsync(codename),
                 response => response == null,
                 GetTaxonomySingleDependency);
@@ -355,11 +336,11 @@ namespace VERSUS.Kentico.Services
         /// <returns>The <see cref="DeliveryTaxonomyListingResponse"/> instance that represents the taxonomy groups. If no query parameters are specified, all taxonomy groups are returned.</returns>
         public async Task<DeliveryTaxonomyListingResponse> GetTaxonomiesAsync(IEnumerable<IQueryParameter> parameters)
         {
-            var identifierTokens = new List<string> { KenticoCloudCacheHelper.TAXONOMY_GROUP_LISTING_IDENTIFIER };
-            identifierTokens.AddNonNullRange(KenticoCloudCacheHelper.GetIdentifiersFromParameters(parameters));
+            var cacheTokens = new List<string> { KenticoCloudCacheHelper.TAXONOMY_GROUP_LISTING_IDENTIFIER };
+            cacheTokens.AddNonNullRange(KenticoCloudCacheHelper.GetIdentifiersFromParameters(parameters));
 
             return await _cacheManager.GetOrCreateAsync(
-                identifierTokens,
+                cacheTokens,
                 () => _deliveryClient.GetTaxonomiesAsync(parameters),
                 response => response.Taxonomies.Count <= 0,
                 GetTaxonomyListingDependencies);
@@ -374,17 +355,17 @@ namespace VERSUS.Kentico.Services
         /// </summary>
         /// <param name="response">The <see cref="DeliveryItemResponse"/> or <see cref="DeliveryItemResponse{T}"/>, either strongly-typed, or runtime-typed.</param>
         /// <returns>Identifiers of all formats of the item, its modular content items, taxonomies used in elements, underlying content type and eventually its elements (when present in the cache).</returns>
-        private IEnumerable<CacheTokenPair> GetContentItemSingleDependencies(dynamic response)
+        private IEnumerable<CacheTokenPair> GetItemResponseDependencies(dynamic response)
         {
             var dependencies = new List<CacheTokenPair>();
 
-            if (KenticoCloudCacheHelper.IsDeliveryItemSingleResponse(response) && response?.Item != null)
+            if (KenticoCloudCacheHelper.IsDeliveryItemResponse(response) && response?.Item != null)
             {
-                dependencies.AddNonNullRange((IEnumerable<CacheTokenPair>)GetContentItemDependencies(response.Item));
+                dependencies.AddNonNullRange((IEnumerable<CacheTokenPair>)GetItemDependencies(response.Item));
 
                 foreach (var item in response.LinkedItems)
                 {
-                    dependencies.AddNonNullRange((IEnumerable<CacheTokenPair>)GetContentItemDependencies(item));
+                    dependencies.AddNonNullRange((IEnumerable<CacheTokenPair>)GetItemDependencies(item));
                 }
             }
 
@@ -396,17 +377,17 @@ namespace VERSUS.Kentico.Services
         /// </summary>
         /// <param name="response">The <see cref="JObject"/> response.</param>
         /// <returns>Identifiers of all formats of the item, its modular content items, taxonomies used in elements, underlying content type and eventually its elements (when present in the cache).</returns>
-        private IEnumerable<CacheTokenPair> GetContentItemSingleJsonDependencies(JObject response)
+        private IEnumerable<CacheTokenPair> GetItemJsonResponseDependencies(JObject response)
         {
             var dependencies = new List<CacheTokenPair>();
 
-            if (KenticoCloudCacheHelper.IsDeliveryItemSingleJsonResponse(response))
+            if (KenticoCloudCacheHelper.IsDeliveryItemJsonResponse(response))
             {
-                dependencies.AddNonNullRange(GetContentItemDependencies(response[KenticoCloudCacheHelper.ITEM_IDENTIFIER]));
+                dependencies.AddNonNullRange(GetItemDependencies(response[KenticoCloudCacheHelper.ITEM_IDENTIFIER]));
 
                 foreach (var item in response[KenticoCloudCacheHelper.MODULAR_CONTENT_IDENTIFIER]?.Children())
                 {
-                    dependencies.AddNonNullRange(GetContentItemDependencies(item));
+                    dependencies.AddNonNullRange(GetItemDependencies(item));
                 }
             }
 
@@ -418,7 +399,7 @@ namespace VERSUS.Kentico.Services
         /// </summary>
         /// <param name="response">The <see cref="DeliveryItemListingResponse"/> or <see cref="DeliveryItemListingResponse{T}"/>, either strongly-typed, or runtime-typed.</param>
         /// <returns>Identifiers of all formats of the items, their modular content items, taxonomies used in elements, underlying content types and eventually their elements (when present in the cache).</returns>
-        private IEnumerable<CacheTokenPair> GetContentItemListingDependencies(dynamic response)
+        private IEnumerable<CacheTokenPair> GetItemListingResponseDependencies(dynamic response)
         {
             var dependencies = new List<CacheTokenPair>();
 
@@ -426,12 +407,12 @@ namespace VERSUS.Kentico.Services
             {
                 foreach (dynamic item in response.Items)
                 {
-                    dependencies.AddNonNullRange((IEnumerable<CacheTokenPair>)GetContentItemDependencies(item));
+                    dependencies.AddNonNullRange((IEnumerable<CacheTokenPair>)GetItemDependencies(item));
                 }
 
                 foreach (var item in response.LinkedItems)
                 {
-                    dependencies.AddNonNullRange((IEnumerable<CacheTokenPair>)GetContentItemDependencies(item));
+                    dependencies.AddNonNullRange((IEnumerable<CacheTokenPair>)GetItemDependencies(item));
                 }
             }
 
@@ -443,7 +424,7 @@ namespace VERSUS.Kentico.Services
         /// </summary>
         /// <param name="response">The <see cref="JObject"/> item listing response.</param>
         /// <returns>Identifiers of all formats of the items, their modular content items, taxonomies used in elements, underlying content types and eventually their elements (when present in the cache).</returns>
-        private IEnumerable<CacheTokenPair> GetContentItemListingJsonDependencies(JObject response)
+        private IEnumerable<CacheTokenPair> GetItemListingJsonResponseDependencies(JObject response)
         {
             var dependencies = new List<CacheTokenPair>();
 
@@ -451,12 +432,12 @@ namespace VERSUS.Kentico.Services
             {
                 foreach (dynamic item in response[KenticoCloudCacheHelper.ITEMS_IDENTIFIER].Children())
                 {
-                    dependencies.AddNonNullRange((IEnumerable<CacheTokenPair>)GetContentItemDependencies(item));
+                    dependencies.AddNonNullRange((IEnumerable<CacheTokenPair>)GetItemDependencies(item));
                 }
 
                 foreach (var item in response[KenticoCloudCacheHelper.MODULAR_CONTENT_IDENTIFIER]?.Children())
                 {
-                    dependencies.AddNonNullRange(GetContentItemDependencies(item));
+                    dependencies.AddNonNullRange(GetItemDependencies(item));
                 }
             }
 
@@ -567,7 +548,7 @@ namespace VERSUS.Kentico.Services
             return null;
         }
 
-        private IEnumerable<CacheTokenPair> GetContentItemDependencies(dynamic item)
+        private IEnumerable<CacheTokenPair> GetItemDependencies(dynamic item)
         {
             var dependencies = new List<CacheTokenPair>();
             KenticoCloudCacheHelper.ExtractCodenamesFromItem(item, out string extractedItemCodename, out string extractedTypeCodename);

@@ -164,7 +164,7 @@ namespace VERSUS.Kentico.Helpers
             }
         }
 
-        public static bool IsDeliveryItemSingleResponse(dynamic response)
+        public static bool IsDeliveryItemResponse(dynamic response)
         {
             return (response is DeliveryItemResponse ||
                 (response.GetType().IsGenericType &&
@@ -178,7 +178,7 @@ namespace VERSUS.Kentico.Helpers
                 response.GetType().GetGenericTypeDefinition() == typeof(DeliveryItemListingResponse<>))) ? true : false;
         }
 
-        public static bool IsDeliveryItemSingleJsonResponse(JObject response)
+        public static bool IsDeliveryItemJsonResponse(JObject response)
         {
             return (response?[ITEM_IDENTIFIER] != null) ? true : false;
         }
