@@ -15,14 +15,16 @@ namespace VERSUS.Kentico.Services
 {
     public class CachedDeliveryClient : IDeliveryClient
     {
-        private ICacheManager _cacheManager;
-        private IDeliveryClient _deliveryClient;
+        private readonly ICacheManager _cacheManager;
+        private readonly IDeliveryClient _deliveryClient;
+        private readonly IDeliveryClient _previewDeliveryClient;
 
         #region Constructors
 
-        public CachedDeliveryClient(ICacheManager cacheManager, IDeliveryClient deliveryClient)
+        public CachedDeliveryClient(ICacheManager cacheManager, IDeliveryClient deliveryClient, IDeliveryClient previewDeliveryClient)
         {
             _deliveryClient = deliveryClient;
+            _previewDeliveryClient = previewDeliveryClient;
             _cacheManager = cacheManager;
         }
 
@@ -44,6 +46,7 @@ namespace VERSUS.Kentico.Services
             return await _cacheManager.GetOrCreateAsync(
                 cacheTokens,
                 () => _deliveryClient.GetItemJsonAsync(codename, parameters),
+                _previewDeliveryClient == null ? (Func<Task<JObject>>)null : () => _previewDeliveryClient.GetItemJsonAsync(codename, parameters),
                 response => response == null,
                 GetItemJsonResponseDependencies);
         }
@@ -61,6 +64,7 @@ namespace VERSUS.Kentico.Services
             return await _cacheManager.GetOrCreateAsync(
                 cacheTokens,
                 () => _deliveryClient.GetItemsJsonAsync(parameters),
+                _previewDeliveryClient == null ? (Func<Task<JObject>>)null : () => _previewDeliveryClient.GetItemsJsonAsync(parameters),
                 response => response["items"].Count() <= 0,
                 GetItemListingJsonResponseDependencies);
         }
@@ -102,6 +106,7 @@ namespace VERSUS.Kentico.Services
             return await _cacheManager.GetOrCreateAsync(
                 cacheTokens,
                 () => _deliveryClient.GetItemAsync(codename, parameters),
+                _previewDeliveryClient == null ? (Func<Task<DeliveryItemResponse>>)null : () => _previewDeliveryClient.GetItemAsync(codename, parameters),
                 response => response == null,
                 GetItemResponseDependencies);
         }
@@ -121,6 +126,7 @@ namespace VERSUS.Kentico.Services
             return await _cacheManager.GetOrCreateAsync(
                 cacheTokens,
                 () => _deliveryClient.GetItemAsync<T>(codename, parameters),
+                _previewDeliveryClient == null ? (Func<Task<DeliveryItemResponse<T>>>)null : () => _previewDeliveryClient.GetItemAsync<T>(codename, parameters),
                 response => response == null,
                 GetItemResponseDependencies);
         }
@@ -149,6 +155,7 @@ namespace VERSUS.Kentico.Services
             return await _cacheManager.GetOrCreateAsync(
                 cacheTokens,
                 () => _deliveryClient.GetItemsAsync(parameters),
+                _previewDeliveryClient == null ? (Func<Task<DeliveryItemListingResponse>>)null : () => _previewDeliveryClient.GetItemsAsync(parameters),
                 response => response.Items.Count <= 0,
                 GetItemListingResponseDependencies);
         }
@@ -173,6 +180,7 @@ namespace VERSUS.Kentico.Services
             return await _cacheManager.GetOrCreateAsync(
                 cacheTokens,
                 () => _deliveryClient.GetItemsAsync<T>(parameters),
+                _previewDeliveryClient == null ? (Func<Task<DeliveryItemListingResponse<T>>>)null : () => _previewDeliveryClient.GetItemsAsync<T>(parameters),
                 response => response.Items.Count <= 0,
                 GetItemListingResponseDependencies);
         }
@@ -189,6 +197,7 @@ namespace VERSUS.Kentico.Services
             return await _cacheManager.GetOrCreateAsync(
                 cacheTokens,
                 () => _deliveryClient.GetTypeJsonAsync(codename),
+                _previewDeliveryClient == null ? (Func<Task<JObject>>)null : () => _previewDeliveryClient.GetTypeJsonAsync(codename),
                 response => response == null,
                 GetTypeSingleJsonDependencies);
         }
@@ -206,6 +215,7 @@ namespace VERSUS.Kentico.Services
             return await _cacheManager.GetOrCreateAsync(
                 cacheTokens,
                 () => _deliveryClient.GetTypesJsonAsync(parameters),
+                _previewDeliveryClient == null ? (Func<Task<JObject>>)null : () => _previewDeliveryClient.GetTypesJsonAsync(parameters),
                 response => response["types"].Count() <= 0,
                 GetTypeListingJsonDependencies);
         }
@@ -222,6 +232,7 @@ namespace VERSUS.Kentico.Services
             return await _cacheManager.GetOrCreateAsync(
                 cacheTokens,
                 () => _deliveryClient.GetTypeAsync(codename),
+                _previewDeliveryClient == null ? (Func<Task<ContentType>>)null : () => _previewDeliveryClient.GetTypeAsync(codename),
                 response => response == null,
                 GetTypeSingleDependencies);
         }
@@ -249,6 +260,7 @@ namespace VERSUS.Kentico.Services
             return await _cacheManager.GetOrCreateAsync(
                 cacheTokens,
                 () => _deliveryClient.GetTypesAsync(parameters),
+                _previewDeliveryClient == null ? (Func<Task<DeliveryTypeListingResponse>>)null : () => _previewDeliveryClient.GetTypesAsync(parameters),
                 response => response.Types.Count <= 0,
                 GetTypeListingDependencies);
         }
@@ -266,6 +278,7 @@ namespace VERSUS.Kentico.Services
             return await _cacheManager.GetOrCreateAsync(
                 cacheTokens,
                 () => _deliveryClient.GetContentElementAsync(contentTypeCodename, contentElementCodename),
+                _previewDeliveryClient == null ? (Func<Task<ContentElement>>)null : () => _previewDeliveryClient.GetContentElementAsync(contentTypeCodename, contentElementCodename),
                 response => response == null,
                 GetContentElementDependencies);
         }
@@ -282,6 +295,7 @@ namespace VERSUS.Kentico.Services
             return await _cacheManager.GetOrCreateAsync(
                 cacheTokens,
                 () => _deliveryClient.GetTaxonomyJsonAsync(codename),
+                _previewDeliveryClient == null ? (Func<Task<JObject>>)null : () => _previewDeliveryClient.GetTaxonomyJsonAsync(codename),
                 response => response == null,
                 GetTaxonomySingleJsonDependency);
         }
@@ -299,6 +313,7 @@ namespace VERSUS.Kentico.Services
             return await _cacheManager.GetOrCreateAsync(
                 cacheTokens,
                 () => _deliveryClient.GetTaxonomiesJsonAsync(parameters),
+                _previewDeliveryClient == null ? (Func<Task<JObject>>)null : () => _previewDeliveryClient.GetTaxonomiesJsonAsync(parameters),
                 response => response["taxonomies"].Count() <= 0,
                 GetTaxonomyListingJsonDependencies);
         }
@@ -315,6 +330,7 @@ namespace VERSUS.Kentico.Services
             return await _cacheManager.GetOrCreateAsync(
                 cacheTokens,
                 () => _deliveryClient.GetTaxonomyAsync(codename),
+                _previewDeliveryClient == null ? (Func<Task<TaxonomyGroup>>)null : () => _previewDeliveryClient.GetTaxonomyAsync(codename),
                 response => response == null,
                 GetTaxonomySingleDependency);
         }
@@ -342,6 +358,7 @@ namespace VERSUS.Kentico.Services
             return await _cacheManager.GetOrCreateAsync(
                 cacheTokens,
                 () => _deliveryClient.GetTaxonomiesAsync(parameters),
+                _previewDeliveryClient == null ? (Func<Task<DeliveryTaxonomyListingResponse>>)null : () => _previewDeliveryClient.GetTaxonomiesAsync(parameters),
                 response => response.Taxonomies.Count <= 0,
                 GetTaxonomyListingDependencies);
         }

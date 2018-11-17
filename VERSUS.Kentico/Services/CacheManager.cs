@@ -27,13 +27,11 @@ namespace VERSUS.Kentico.Services
 
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         private readonly ConcurrentDictionary<string, object> _cacheDummyLocks = new ConcurrentDictionary<string, object>();
-        private readonly ConcurrentDictionary<string, object> _cacheLocks = new ConcurrentDictionary<string, object>();
-        private readonly object _dummyEntryCreationLock = new object();
         private readonly object _entryCreationLock = new object();
-        private bool _disposed;
+        private readonly bool _disposed;
         private readonly int _cacheExpirySeconds;
         private readonly bool _createCacheEntriesInBackground;
-        private IMemoryCache _memoryCache;
+        private readonly IMemoryCache _memoryCache;
 
         #endregion Fields
 
@@ -60,7 +58,7 @@ namespace VERSUS.Kentico.Services
         /// <param name="dependencyFactory">Method to get a collection of identifiers of entries that the current entry depends upon.</param>
         /// <param name="createCacheEntriesInBackground">Flag saying if cache entry should be off-loaded to a background thread.</param>
         /// <returns>The cache entry value, either cached or obtained through the <paramref name="valueFactory"/>.</returns>
-        public async Task<T> GetOrCreateAsync<T>(IEnumerable<string> keyTokens, Func<Task<T>> valueFactory, Func<T, bool> skipCacheDelegate, Func<T, IEnumerable<CacheTokenPair>> dependencyFactory)
+        public async Task<T> GetOrCreateAsync<T>(IEnumerable<string> keyTokens, Func<Task<T>> valueFactory, Func<Task<T>> previewValueFactory, Func<T, bool> skipCacheDelegate, Func<T, IEnumerable<CacheTokenPair>> dependencyFactory)
         {
             await _semaphoreSlim.WaitAsync();
 
@@ -78,11 +76,11 @@ namespace VERSUS.Kentico.Services
                         // Create it in a background thread.
                         if (_createCacheEntriesInBackground)
                         {
-                            _ = Task.Run(() => CreateEntry(key, value, dependencyFactory));
+                            _ = Task.Run(() => CreateEntry(key, value, previewValueFactory, dependencyFactory));
                         }
                         else
                         {
-                            CreateEntry(key, value, dependencyFactory);
+                            CreateEntry(key, value, previewValueFactory, dependencyFactory);
                         }
                     }
 
@@ -144,18 +142,9 @@ namespace VERSUS.Kentico.Services
             return null;
         }
 
-        /// <summary>
-        /// The <see cref="IDisposable.Dispose"/> implementation.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
         #endregion Public methods
 
-        #region Protected methods
+        #region Private methods
 
         /// <summary>
         /// Creates a new cache entry.
@@ -164,15 +153,13 @@ namespace VERSUS.Kentico.Services
         /// <param name="key">String tokens that form a unique identifier of the entry.</param>
         /// <param name="value">Value of the entry.</param>
         /// <param name="dependencyFactory">Method to get a collection of identifier of entries that the current entry depends upon.</param>
-        private void CreateEntry<T>(string key, T value, Func<T, IEnumerable<CacheTokenPair>> dependencyFactory)
+        private async void CreateEntry<T>(string key, T value, Func<Task<T>> previewValueFactory, Func<T, IEnumerable<CacheTokenPair>> dependencyFactory)
         {
-            var dependencies = dependencyFactory(value) ?? new List<CacheTokenPair>();
+            T dependencyValue = previewValueFactory != null ? await previewValueFactory() : value;
+            var dependencies = dependencyFactory(dependencyValue) ?? new List<CacheTokenPair>();
 
             // Restart entries' expiration period each time they're requested.
-            var entryOptions = new MemoryCacheEntryOptions()
-            {
-                SlidingExpiration = TimeSpan.FromSeconds(_cacheExpirySeconds)
-            };
+            var entryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(_cacheExpirySeconds));
 
             foreach (var dependency in dependencies)
             {
@@ -215,12 +202,12 @@ namespace VERSUS.Kentico.Services
             }
         }
 
-        protected bool EntryExists(string key)
+        private bool EntryExists(string key)
         {
             return _memoryCache.TryGetValue(key, out _);
         }
 
-        protected CancellationTokenSource GetOrCreateDummyEntry(string dummyKey)
+        private CancellationTokenSource GetOrCreateDummyEntry(string dummyKey)
         {
             if (!DummyEntryExists(dummyKey, out CancellationTokenSource dummyEntry))
             {
@@ -230,26 +217,11 @@ namespace VERSUS.Kentico.Services
             return dummyEntry;
         }
 
-        protected bool DummyEntryExists(string dummyKey, out CancellationTokenSource dummyEntry)
+        private bool DummyEntryExists(string dummyKey, out CancellationTokenSource dummyEntry)
         {
             return _memoryCache.TryGetValue(dummyKey, out dummyEntry) && !dummyEntry.IsCancellationRequested;
         }
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-                _memoryCache.Dispose();
-            }
-
-            _disposed = true;
-        }
-
-        #endregion Protected methods
+        #endregion Private methods
     }
 }

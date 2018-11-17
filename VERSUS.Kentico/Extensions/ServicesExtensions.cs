@@ -1,4 +1,5 @@
-﻿using KenticoCloud.Delivery;
+﻿using System;
+using KenticoCloud.Delivery;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,7 +29,8 @@ namespace VERSUS.Kentico.Extensions
                              .WithOptions(_ => sp.GetRequiredService<IOptionsSnapshot<DeliveryOptions>>().Value)
                              .WithCodeFirstTypeProvider(sp.GetRequiredService<ICodeFirstTypeProvider>())
                              .WithContentLinkUrlResolver(sp.GetRequiredService<IContentLinkUrlResolver>())
-                             .Build()
+                             .Build(),
+                         CreatePreviewDeliveryClientOrNull(sp)
                      ));
 
             var sericeProvider = services.BuildServiceProvider();
@@ -38,6 +40,25 @@ namespace VERSUS.Kentico.Extensions
             HtmlHelperExtensions.ResponsiveWidths = versusOptions.ResponsiveWidths;
 
             return services;
+        }
+
+        private static IDeliveryClient CreatePreviewDeliveryClientOrNull(IServiceProvider sp)
+        {
+            var deliveryOptions = sp.GetRequiredService<IOptionsSnapshot<DeliveryOptions>>().Value;
+
+            if (!string.IsNullOrEmpty(deliveryOptions.PreviewApiKey))
+            {
+                deliveryOptions.UsePreviewApi = true;
+                deliveryOptions.UseSecuredProductionApi = false;
+
+                return DeliveryClientBuilder
+                    .WithOptions(_ => deliveryOptions)
+                    .WithCodeFirstTypeProvider(sp.GetRequiredService<ICodeFirstTypeProvider>())
+                    .WithContentLinkUrlResolver(sp.GetRequiredService<IContentLinkUrlResolver>())
+                    .Build();
+            }
+
+            return null;
         }
     }
 }

@@ -6,7 +6,7 @@ using VERSUS.Kentico.Services.Models;
 
 namespace VERSUS.Kentico.Services
 {
-    public interface ICacheManager : IDisposable
+    public interface ICacheManager
     {
         /// <summary>
         /// Gets an existing cache entry or creates one using the supplied <paramref name="valueFactory"/>.
@@ -18,7 +18,7 @@ namespace VERSUS.Kentico.Services
         /// <param name="dependencyListFactory">Method to get a collection of identifiers of entries that the current entry depends upon.</param>
         /// <param name="createCacheEntriesInBackground">Flag saying if cache entry should be off-loaded to a background thread.</param>
         /// <returns>The cache entry value, either cached or obtained through the <paramref name="valueFactory"/>.</returns>
-        Task<T> GetOrCreateAsync<T>(IEnumerable<string> identifierTokens, Func<Task<T>> valueFactory, Func<T, bool> skipCacheDelegate, Func<T, IEnumerable<CacheTokenPair>> dependencyListFactory);
+        Task<T> GetOrCreateAsync<T>(IEnumerable<string> identifierTokens, Func<Task<T>> valueFactory, Func<Task<T>> previewValueFactory, Func<T, bool> skipCacheDelegate, Func<T, IEnumerable<CacheTokenPair>> dependencyListFactory);
 
         /// <summary>
         /// Tries to get a cache entry.
