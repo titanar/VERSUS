@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 using KenticoCloud.Delivery;
@@ -126,42 +125,9 @@ namespace VERSUS.Kentico.Helpers
 
         #region Public methods
 
-        public static IEnumerable<string> GetItemJsonTaxonomyCodenamesByElements(JToken elementsToken)
+        public static IEnumerable<string> GetIdentifiersFromParameters(IEnumerable<IQueryParameter> parameters)
         {
-            var taxonomyElements = elementsToken?.SelectMany(t => t.Children())?.Where(
-                        e => e[TYPE_IDENTIFIER] != null && e[TYPE_IDENTIFIER].ToString().Equals(TAXONOMY_GROUP_SINGLE_IDENTIFIER, StringComparison.Ordinal) &&
-                        e[TAXONOMY_GROUP_IDENTIFIER] != null && !string.IsNullOrEmpty(e[TAXONOMY_GROUP_IDENTIFIER].ToString()));
-
-            return taxonomyElements.Select(e => e[TAXONOMY_GROUP_IDENTIFIER].ToString());
-        }
-
-        public static IEnumerable<string> GetItemTaxonomyCodenamesByElements(dynamic item)
-        {
-            if (item is ContentItem)
-            {
-                return GetItemJsonTaxonomyCodenamesByElements(item?.Elements);
-            }
-            else if (item is JObject)
-            {
-                return GetItemJsonTaxonomyCodenamesByElements(item?[ELEMENTS_IDENTIFIER]);
-            }
-            else
-            {
-                var codenames = new List<string>();
-                var properties = item?.GetType().GetProperties();
-
-                foreach (var property in properties)
-                {
-                    if (property.PropertyType.GenericTypeArguments.Length > 0 &&
-                        property.PropertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>) &&
-                        property.PropertyType.GenericTypeArguments[0] == typeof(TaxonomyTerm))
-                    {
-                        var codenameProperty = item.GetType().GetField($"{property.Name}Codename");
-                        codenames.Add(codenameProperty.GetValue(item) as string);
-                    }
-                }
-                return codenames;
-            }
+            return parameters?.Select(p => p.GetQueryStringParameter());
         }
 
         public static bool IsDeliveryItemResponse(dynamic response)
@@ -186,33 +152,6 @@ namespace VERSUS.Kentico.Helpers
         public static bool IsDeliveryItemListingJsonResponse(JObject response)
         {
             return (response?[ITEMS_IDENTIFIER] != null) ? true : false;
-        }
-
-        public static IEnumerable<string> GetIdentifiersFromParameters(IEnumerable<IQueryParameter> parameters)
-        {
-            return parameters?.Select(p => p.GetQueryStringParameter());
-        }
-
-        public static void ExtractCodenamesFromItem(dynamic item, out string extractedItemCodename, out string extractedTypeCodename)
-        {
-            extractedItemCodename = null;
-            extractedTypeCodename = null;
-
-            if ((item is ContentItem || !(item is JProperty) && !(item is JObject)) && item?.System != null)
-            {
-                extractedItemCodename = item.System.Codename?.ToString();
-                extractedTypeCodename = item.System.Type?.ToString();
-            }
-            else if (item is JProperty && item?.Value?[SYSTEM_IDENTIFIER] != null)
-            {
-                extractedItemCodename = item.Value[SYSTEM_IDENTIFIER][CODENAME_IDENTIFIER]?.ToString();
-                extractedTypeCodename = item.Value[SYSTEM_IDENTIFIER][TYPE_IDENTIFIER]?.ToString();
-            }
-            else if (item is JObject && item[SYSTEM_IDENTIFIER] != null)
-            {
-                extractedItemCodename = item?[SYSTEM_IDENTIFIER][CODENAME_IDENTIFIER]?.ToString();
-                extractedTypeCodename = item?[SYSTEM_IDENTIFIER][TYPE_IDENTIFIER]?.ToString();
-            }
         }
 
         public static IEnumerable<string> GetDependentTypeNames(string typeCodeName)

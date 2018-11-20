@@ -18,19 +18,21 @@ namespace VERSUS.Kentico.Extensions
             services.Configure<DeliveryOptions>(configuration)
 
                     .AddSingleton<ICacheManager, CacheManager>()
+                    .AddTransient<IDependencyResolver, DependencyResolver>()
                     .AddTransient<ICodeFirstTypeProvider, ContentTypeProvider>()
                     .AddTransient<IContentLinkUrlResolver, ContentLinkUrlResolver>()
 
                     .AddDeliveryClient(configuration)
 
-                    .AddSingleton<IDeliveryClient>(sp => new CachedDeliveryClient(
-                          sp.GetRequiredService<ICacheManager>(),
+                    .AddScoped<IDeliveryClient>(sp => new CachedDeliveryClient(
+                         sp.GetRequiredService<ICacheManager>(),
                          DeliveryClientBuilder
                              .WithOptions(_ => sp.GetRequiredService<IOptionsSnapshot<DeliveryOptions>>().Value)
                              .WithCodeFirstTypeProvider(sp.GetRequiredService<ICodeFirstTypeProvider>())
                              .WithContentLinkUrlResolver(sp.GetRequiredService<IContentLinkUrlResolver>())
                              .Build(),
-                         CreatePreviewDeliveryClientOrNull(sp)
+                         CreatePreviewDeliveryClientOrNull(sp),
+                         sp.GetRequiredService<IDependencyResolver>()
                      ));
 
             var sericeProvider = services.BuildServiceProvider();

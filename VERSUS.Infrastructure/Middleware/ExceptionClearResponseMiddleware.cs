@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 
@@ -16,14 +15,14 @@ namespace VERSUS.Infrastructure.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
-            try
-            {
-                await _next(context);
-            }
-            catch (Exception ex)
-            {
-                context.Response.Redirect("/Site/Error");
-            }
+            //try
+            //{
+            await _next(context);
+            //}
+            //catch (Exception ex)
+            //{
+            //    context.Response.Redirect("/Site/Error");
+            //}
         }
     }
 }

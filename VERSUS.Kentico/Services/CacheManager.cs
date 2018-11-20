@@ -15,7 +15,7 @@ using VERSUS.Kentico.Services.Models;
 
 namespace VERSUS.Kentico.Services
 {
-    public class CacheManager : ICacheManager
+    internal class CacheManager : ICacheManager
     {
         #region Constants
 
@@ -28,7 +28,6 @@ namespace VERSUS.Kentico.Services
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         private readonly ConcurrentDictionary<string, object> _cacheDummyLocks = new ConcurrentDictionary<string, object>();
         private readonly object _entryCreationLock = new object();
-        private readonly bool _disposed;
         private readonly int _cacheExpirySeconds;
         private readonly bool _createCacheEntriesInBackground;
         private readonly IMemoryCache _memoryCache;

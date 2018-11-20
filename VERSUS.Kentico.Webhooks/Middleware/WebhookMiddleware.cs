@@ -32,7 +32,9 @@ namespace VERSUS.Kentico.Webhooks.Middleware
         {
             var request = context.Request;
 
-            var (generatedSignature, signatureFromRequest, content) = await ParseRequest(request);
+            request.Headers.TryGetValue("X-Kc-Signature", out var signatureFromRequest);
+            var requestBody = await GetRequestBody(request);
+            var generatedSignature = GenerateHash(requestBody);
 
             if (generatedSignature != signatureFromRequest)
             {
@@ -40,7 +42,7 @@ namespace VERSUS.Kentico.Webhooks.Middleware
             }
             else
             {
-                var model = JsonConvert.DeserializeObject<WebhookModel>(content);
+                var model = JsonConvert.DeserializeObject<WebhookModel>(requestBody);
 
                 switch (model.Message.Type)
                 {
@@ -59,17 +61,15 @@ namespace VERSUS.Kentico.Webhooks.Middleware
             }
         }
 
-        private async Task<(string generatedSignature, string signatureFromRequest, string content)> ParseRequest(HttpRequest request)
+        private async Task<string> GetRequestBody(HttpRequest request)
         {
             using (var reader = new StreamReader(request.Body, Encoding.UTF8, true, 1024, true))
             {
-                request.Headers.TryGetValue("X-Kc-Signature", out var signatureFromRequest);
-
                 request.EnableBuffering();
                 request.Body.Position = 0;
-                var content = await reader.ReadToEndAsync();
+                var requestBody = await reader.ReadToEndAsync();
 
-                return (GenerateHash(content), signatureFromRequest, content);
+                return requestBody;
             }
         }
 
