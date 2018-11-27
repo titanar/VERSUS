@@ -17,6 +17,7 @@ namespace VERSUS.Infrastructure.Middleware
         {
             //try
             //{
+            // Set http status to 418? and set location header
             await _next(context);
             //}
             //catch (Exception ex)

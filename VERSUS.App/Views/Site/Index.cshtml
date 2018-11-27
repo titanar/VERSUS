@@ -5,21 +5,3 @@
 
 @section Scripts {
 }
-
-<div class="row">
-    <div class="col-md-3">
-        <h2>Application</h2>
-        <ul>
-            <li>@Html.DisplayFor(vm => vm.Announcement)</li>
-            <li>@Html.DisplayFor(vm => vm.Sidebar)</li>
-            <li>
-
-                @Html.React("Components.SiteTest", Model)
-            </li>
-            @foreach (VERSUS.Infrastructure.Models.Review review in ViewBag.Reviews)
-            {
-                <li>@review.Content</li>
-            }
-        </ul>
-    </div>
-</div>
