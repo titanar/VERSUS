@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-using VERSUS.Kentico.Models;
+using VERSUS.Kentico.Types;
 
 namespace VERSUS.App.Models
 {

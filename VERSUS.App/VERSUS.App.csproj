@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VERSUS.Infrastructure\VERSUS.Infrastructure.csproj" />
-    <ProjectReference Include="..\VERSUS.Kentico.Models\VERSUS.Kentico.Models.csproj" />
+    <ProjectReference Include="..\VERSUS.Kentico.Types\VERSUS.Kentico.Types.csproj" />
     <ProjectReference Include="..\VERSUS.Kentico.Webhooks\VERSUS.Kentico.Webhooks.csproj" />
     <ProjectReference Include="..\VERSUS.Kentico\VERSUS.Kentico.csproj" />
   </ItemGroup>

@@ -2,7 +2,7 @@
 
 using KenticoCloud.Delivery;
 
-using VERSUS.Kentico.Models;
+using VERSUS.Kentico.Types;
 
 namespace VERSUS.App.Models
 {

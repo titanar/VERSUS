@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VERSUS.Core\VERSUS.Core.csproj" />
-    <ProjectReference Include="..\VERSUS.Kentico.Models\VERSUS.Kentico.Models.csproj" />
+    <ProjectReference Include="..\VERSUS.Kentico.Types\VERSUS.Kentico.Types.csproj" />
   </ItemGroup>
 
 </Project>

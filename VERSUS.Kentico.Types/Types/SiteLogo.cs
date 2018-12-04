@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 using KenticoCloud.Delivery;
 
-namespace VERSUS.Kentico.Models
+namespace VERSUS.Kentico.Types
 {
     public partial class SiteLogo
     {

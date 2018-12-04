@@ -9,11 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VERSUS.Infrastructure", "VE
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VERSUS.Kentico", "VERSUS.Kentico\VERSUS.Kentico.csproj", "{7D1605E4-551A-4CAC-9C88-FF92B776BA70}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VERSUS.Kentico.Models", "VERSUS.Kentico.Models\VERSUS.Kentico.Models.csproj", "{952801E0-2E44-428A-B19A-966B7AA2E704}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VERSUS.Kentico.Types", "VERSUS.Kentico.Types\VERSUS.Kentico.Types.csproj", "{952801E0-2E44-428A-B19A-966B7AA2E704}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VERSUS.Core", "VERSUS.Core\VERSUS.Core.csproj", "{CC554FBF-B920-4FF6-A348-0E375C27329E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VERSUS.Kentico.Webhooks", "VERSUS.Kentico.Webhooks\VERSUS.Kentico.Webhooks.csproj", "{E17A37E6-F38C-4F05-B4DB-AC0F08373320}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VERSUS.Kentico.Webhooks", "VERSUS.Kentico.Webhooks\VERSUS.Kentico.Webhooks.csproj", "{E17A37E6-F38C-4F05-B4DB-AC0F08373320}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

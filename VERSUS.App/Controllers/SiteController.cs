@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using VERSUS.App.Models;
 using VERSUS.Infrastructure.Extensions;
 using VERSUS.Infrastructure.Services;
-using VERSUS.Kentico.Models;
+using VERSUS.Kentico.Types;
 
 namespace VERSUS.App.Controllers
 {

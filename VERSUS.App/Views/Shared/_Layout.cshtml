@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     var random = new Random();
 }
 
@@ -12,19 +11,19 @@
 
     @* Try moving these to the bottom with the other scripts *@
     <environment include="Development">
-        <link rel="stylesheet" href="/css/versus.css" asp-append-version="true" />
-        <link rel="stylesheet" href="/css/temp.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/versus.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/temp.css" asp-append-version="true" />
 
         @* versus.js already includes all libraries *@
-        <script src="/js/versus.js" asp-append-version="true"></script>
+        <script src="~/js/versus.js" asp-append-version="true"></script>
     </environment>
     <environment exclude="Development">
-        <link rel="stylesheet" href="/css/versus.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/versus.min.css" asp-append-version="true" />
 
         <script crossorigin="anonymous" src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
         <script crossorigin="anonymous" src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
 
-        <script src="/js/versus.min.js" asp-append-version="true"></script>
+        <script src="~/js/versus.min.js" asp-append-version="true"></script>
     </environment>
 </head>
 <body>
@@ -75,24 +74,25 @@
             </div>
 
             @* Endless scroll container *@
-            <div class="col-11 d-flex product-scroll-section">
+            <div class="col-11 product-scroll-section-wrapper">
+                <div id="product-scroll-section" class="product-scroll-section">
 
-                @for (int i = 0; i < 10; i++)
-                {
-                    @* Product item *@
-                    <div class="product-box d-flex">
-                            <div class="product-slideshow">
-                                @* Several images here, sliding in some ways *@
-                                <div class="fake-image product-image" style="background:@Html.Raw(String.Format("#{0:X6}", random.Next(0x1000000))) "></div>
-                            </div>
+                    @for (int i = 0; i < 20; i++)
+                    {
+                        var width = i % 3 == 0 ? 2 : 3;
 
-                            <div class="product-details">
+                        @* Product item *@
+                        <figure class="col-@width product-box" data-groups='["shirt"]' style="height: @(width * 100)px ">
+                            <div class="product-details" style="background:@Html.Raw(String.Format("#{0:X6}", random.Next(0x1000000)));">
                                 <h2>VERSUS Shirt @i</h2>
                                 <h4 class="product-price">$23.50</h4>
                                 <p class="text-overflow">This is an exciting shirt that you want to buy.</p>
-                        </div>
-                    </div>}
+                            </div>
+                        </figure>
+                    }
 
+                    <div class="col-1 product-scroll-sizer"></div>
+                </div>
             </div>
         </div>
 
