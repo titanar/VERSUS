@@ -1,7 +1,32 @@
 ﻿@model SiteViewModel
 @{
     ViewData["Title"] = "Home";
+
+    var random = new Random();
 }
+
+@* Endless scroll container *@
+<div class="col-11 product-scroll-section-wrapper">
+    <div id="product-scroll-section" class="product-scroll-section">
+
+        @for (int i = 0; i < 20; i++)
+        {
+            var width = i % 3 == 0 ? 2 : 4;
+            var height = i % 5 == 0 ? 2 : 4;
+
+            @* Product item *@
+            <figure class="col-@width product-box" data-groups='["shirt"]' style="height: @(width * height * 25)px ">
+                <div class="product-details" style="background:@Html.Raw(String.Format("#{0:X6}", random.Next(0x1000000)));">
+                    <h2>VERSUS Shirt @i</h2>
+                    <h4 class="product-price">$23.50</h4>
+                    <p class="text-overflow">This is an exciting shirt that you want to buy.</p>
+                </div>
+            </figure>
+        }
+
+        <div class="col-1 product-scroll-sizer"></div>
+    </div>
+</div>
 
 @section Scripts {
 }

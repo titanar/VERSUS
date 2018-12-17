@@ -1,0 +1,16 @@
+﻿@model CookieConsentViewModel
+
+<div id="cookieConsent" class="row announcement alert alert-info alert-dismissible">
+    <span class="h4">@Model.Header</span>
+    <a asp-controller="Home" asp-action="Privacy" class="btn btn-info navbar-btn">Learn More</a>
+    <button type="button" class="btn btn-default navbar-btn" data-cookie-string="@Model.CookieString">Accept</button>
+</div>
+
+<script>
+    (function () {
+        document.querySelector("#cookieConsent button[data-cookie-string]").addEventListener("click", function (el) {
+            document.cookie = el.target.dataset.cookieString;
+            document.querySelector("#cookieConsent").classList.add("hidden");
+        }, false);
+    })();
+</script>

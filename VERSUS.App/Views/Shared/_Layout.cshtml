@@ -1,114 +1,51 @@
-﻿@{
-    var random = new Random();
-}
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - VERSUS.App</title>
-
-    @* Try moving these to the bottom with the other scripts *@
+    <title>@ViewData["Title"] - VERSUS</title>
     <environment include="Development">
         <link rel="stylesheet" href="~/css/versus.css" asp-append-version="true" />
         <link rel="stylesheet" href="~/css/temp.css" asp-append-version="true" />
-
-        @* versus.js already includes all libraries *@
-        <script src="~/js/versus.js" asp-append-version="true"></script>
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="~/css/versus.min.css" asp-append-version="true" />
-
-        <script crossorigin="anonymous" src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
-        <script crossorigin="anonymous" src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
-
-        <script src="~/js/versus.min.js" asp-append-version="true"></script>
     </environment>
 </head>
 <body>
-
-    @* top bar content *@
-    @*<partial name="_CookieConsentPartial" />*@
-
-    @* Put this where controller body would make sense *@
-    @RenderBody()
 
     <div class="container-fluid d-flex flex-column body-content">
 
         @* Primary announcements row *@
         <div class="row announcements-primary">
             <div class="col">
-                <div class="row announcement alert alert-warning alert-dismissible">
-                    <span class="h4 font-weight-bold colon-after">ANNOUNCEMENT</span>
-                    <span class="h4">A new sale is going on, CHECK IT OUT!</span>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
-                </div>
+                @await Component.InvokeAsync(nameof(Announcement), AnnouncementTypeEnum.Top)
+                @await Component.InvokeAsync(nameof(CookieConsent))
             </div>
         </div>
 
         @* Main content row *@
         <div class="row main-content">
-            <div class="col navigation">
-                <div class="row">
-                    <a href="/"><img src="#" alt="Logo" /></a>
-                </div>
-                <div class="row">
-                    <a class="col navigation-item" href="/Search">Search</a>
-                </div>
-                <div class="row">
-                    <a class="col navigation-item" href="/">Lines</a>
-                </div>
-                <div class="row">
-                    <a class="col navigation-item" href="/His">His</a>
-                </div>
-                <div class="row">
-                    <a class="col navigation-item" href="/Her">Her</a>
-                </div>
-                <div class="row">
-                    <a class="col navigation-item" href="/Gear">Gear</a>
-                </div>
-                <div class="row">
-                    <a class="col navigation-item" href="/About">About</a>
-                </div>
-            </div>
-
-            @* Endless scroll container *@
-            <div class="col-11 product-scroll-section-wrapper">
-                <div id="product-scroll-section" class="product-scroll-section">
-
-                    @for (int i = 0; i < 20; i++)
-                    {
-                        var width = i % 3 == 0 ? 2 : 3;
-
-                        @* Product item *@
-                        <figure class="col-@width product-box" data-groups='["shirt"]' style="height: @(width * 100)px ">
-                            <div class="product-details" style="background:@Html.Raw(String.Format("#{0:X6}", random.Next(0x1000000)));">
-                                <h2>VERSUS Shirt @i</h2>
-                                <h4 class="product-price">$23.50</h4>
-                                <p class="text-overflow">This is an exciting shirt that you want to buy.</p>
-                            </div>
-                        </figure>
-                    }
-
-                    <div class="col-1 product-scroll-sizer"></div>
-                </div>
-            </div>
+            @await Component.InvokeAsync(nameof(Navigation))
+            @RenderBody()
         </div>
 
         @* Secondary announcements row *@
         <div class="row announcements-secondary">
             <div class="col">
-                <div class="row announcement alert alert-info alert-dismissible">
-                    <span class="h5 font-weight-bold colon-after">FALL SALE</span>
-                    <span class="h5">Don't miss the upcoming stuff!</span>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
-                </div>
+                @await Component.InvokeAsync(nameof(Announcement), AnnouncementTypeEnum.Bottom)
             </div>
         </div>
     </div>
 
     @* Leave these scripts at the end to not block the response *@
+    <environment include="Development">
+        @* versus.js already includes all libraries *@
+        <script src="~/js/versus.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="~/js/versus.min.js" asp-append-version="true"></script>
+    </environment>
     @RenderSection("Scripts", required: false)
     @Html.ReactInitJavaScript()
 </body>

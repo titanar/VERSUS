@@ -10,15 +10,18 @@ namespace VERSUS.App.Models
     {
         public readonly Asset Icon;
 
+        public string Title { get; private set; }
+
         public SidebarItemViewModel(object sidebarItem)
         {
-            if (sidebarItem.GetType() == typeof(SiteSection))
+            if (sidebarItem.GetType() == typeof(SiteSection) && sidebarItem is SiteSection sectionItem)
             {
-                Icon = ((SiteSection)sidebarItem).Icon.First();
+                Icon = sectionItem.Icon.First();
+                Title = sectionItem.Title;
             }
-            else if (sidebarItem.GetType() == typeof(SiteLogo))
+            else if (sidebarItem.GetType() == typeof(SiteLogo) && sidebarItem is SiteLogo logoItem)
             {
-                Icon = ((SiteLogo)sidebarItem).Logo.First();
+                Icon = logoItem.Logo.First();
             }
         }
     }

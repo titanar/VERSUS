@@ -1,0 +1,16 @@
+﻿@model NavigationViewModel
+
+<div class="col navigation">
+    <div class="row">
+        <a href="/"><img src="#" alt="Logo" /></a>
+    </div>
+    <div class="row">
+        <a class="col navigation-item" href="/Search">Search</a>
+    </div>
+    @foreach (var navItem in Model.Sidebar)
+    {
+        <div class="row">
+            <a class="col navigation-item" href="/@navItem.Title">@navItem.Title</a>
+        </div>
+    }
+</div>

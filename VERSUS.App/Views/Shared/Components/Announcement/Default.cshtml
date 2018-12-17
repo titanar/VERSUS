@@ -1,0 +1,10 @@
+﻿@model AnnouncementViewModel
+
+@if (!string.IsNullOrEmpty(Model.Announcement))
+{
+    <div class="row announcement alert alert-@Model.Level.ToString().ToLower() alert-dismissible">
+        <span class="h4 font-weight-bold colon-after">@Model.Title</span>
+        <span class="h4">@Model.Announcement</span>
+        <button type="button" class="btn btn-default navbar-btn">X</button>
+    </div>
+}
