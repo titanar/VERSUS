@@ -1,5 +1,6 @@
 ﻿@model SidebarItemViewModel
 
-<span>
-    <img src=" @Model.Icon.Url" asp-append-version="true" />
-</span>
+<div class="row">
+    <img src=" @Model.Icon?.Url" asp-append-version="true" />
+    <a class="col navigation-item" href="/@Model.Title">@Model.Title</a>
+</div>

@@ -10,9 +10,9 @@ using VERSUS.Kentico.Types;
 
 namespace VERSUS.App.ViewComponents
 {
-    public class Navigation : SharedViewComponent
+    public class Sidebar : SharedViewComponent
     {
-        public Navigation(IDeliveryClient deliveryClient) : base(deliveryClient)
+        public Sidebar(IDeliveryClient deliveryClient) : base(deliveryClient)
         {
         }
 
@@ -20,7 +20,7 @@ namespace VERSUS.App.ViewComponents
         {
             var viewModel = await DeliveryObservable
                 .GetItemObservable<Site>("site")
-                .Select(s => new NavigationViewModel(s));
+                .Select(s => new SidebarViewModel(s));
 
             return View(viewModel);
         }

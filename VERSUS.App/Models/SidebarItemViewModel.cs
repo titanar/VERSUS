@@ -12,6 +12,11 @@ namespace VERSUS.App.Models
 
         public string Title { get; private set; }
 
+        public SidebarItemViewModel(string title)
+        {
+            Title = title;
+        }
+
         public SidebarItemViewModel(object sidebarItem)
         {
             if (sidebarItem.GetType() == typeof(SiteSection) && sidebarItem is SiteSection sectionItem)

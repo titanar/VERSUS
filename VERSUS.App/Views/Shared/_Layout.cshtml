@@ -19,21 +19,21 @@
         @* Primary announcements row *@
         <div class="row announcements-primary">
             <div class="col">
-                @await Component.InvokeAsync(nameof(Announcement), AnnouncementTypeEnum.Top)
-                @await Component.InvokeAsync(nameof(CookieConsent))
+                @(await Component.InvokeAsync<Announcement>(AnnouncementTypeEnum.Top))
+                @(await Component.InvokeAsync<CookieConsent>())
             </div>
         </div>
 
         @* Main content row *@
         <div class="row main-content">
-            @await Component.InvokeAsync(nameof(Navigation))
+            @(await Component.InvokeAsync<Sidebar>())
             @RenderBody()
         </div>
 
         @* Secondary announcements row *@
         <div class="row announcements-secondary">
             <div class="col">
-                @await Component.InvokeAsync(nameof(Announcement), AnnouncementTypeEnum.Bottom)
+                @(await Component.InvokeAsync<Announcement>(AnnouncementTypeEnum.Bottom))
             </div>
         </div>
     </div>

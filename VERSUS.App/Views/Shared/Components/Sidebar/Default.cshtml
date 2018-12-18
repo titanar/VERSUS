@@ -1,0 +1,11 @@
+﻿@model SidebarViewModel
+@{
+    var logo = new SidebarItemViewModel("Logo");
+    var search = new SidebarItemViewModel("Search");
+
+}
+<div class="col navigation">
+    @Html.DisplayFor(m => logo)
+    @Html.DisplayFor(m => search)
+    @Html.DisplayFor(m => m.Sidebar)
+</div>

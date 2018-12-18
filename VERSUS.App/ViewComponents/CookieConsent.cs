@@ -10,15 +10,19 @@ namespace VERSUS.App.ViewComponents
         {
             var consentFeature = HttpContext.Features.Get<ITrackingConsentFeature>();
             var showBanner = !consentFeature?.CanTrack ?? false;
-            var cookieString = consentFeature?.CreateConsentCookie();
+            string cookieString = null;
 
-            return showBanner ? View(
-                new CookieConsentViewModel
-                {
-                    Header = header ?? "We use cookies",
-                    CookieString = cookieString
-                }
-                ) : View(string.Empty);
+            if (showBanner)
+            {
+                cookieString = consentFeature?.CreateConsentCookie();
+            }
+
+            return View(new CookieConsentViewModel
+            {
+                Show = showBanner,
+                Header = header ?? "We use cookies",
+                CookieString = cookieString
+            });
         }
     }
 }

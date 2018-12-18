@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="KenticoCloud.Delivery.Rx" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0-preview3-35497" />
+    <PackageReference Include="KenticoCloud.Delivery.Rx" Version="9.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.0.0-preview.18572.1" />
   </ItemGroup>
 
   <ItemGroup>
