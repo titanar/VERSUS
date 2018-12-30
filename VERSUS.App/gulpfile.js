@@ -14,16 +14,14 @@ var CSS_FOLDER_DEVELOPMENT = "Content/css/*" + SCSS_EXTENSION,
     CSS_FOLDER_PRODUCTION = "wwwroot/css",
     STATICFILES_FOLDER_PRODUCTION = "wwwroot";
 
-
 var CSS_FILE_DEVELOPMENT = "versus" + CSS_EXTENSION,
     CSS_FILE_PRODUCTION = "versus.min" + CSS_EXTENSION;
 
 gulp.task("css", function () {
-
     return merge2(
-            gulp.src("node_modules/bootstrap/dist/css/bootstrap.css"),
-            gulp.src(CSS_FOLDER_DEVELOPMENT)
-        )
+        //gulp.src("node_modules/bootstrap/dist/css/bootstrap.css"),
+        gulp.src(CSS_FOLDER_DEVELOPMENT)
+    )
         .pipe(sass())
         .pipe(concat(CSS_FILE_DEVELOPMENT))
         .pipe(gulp.dest(CSS_FOLDER_PRODUCTION))
@@ -33,7 +31,6 @@ gulp.task("css", function () {
 });
 
 gulp.task("static_files", function () {
-
     // Move static files
     return gulp.src(STATICFILES_FOLDER_DEVELOPMENT, { nodir: true })
         .pipe(gulp.dest(STATICFILES_FOLDER_PRODUCTION));

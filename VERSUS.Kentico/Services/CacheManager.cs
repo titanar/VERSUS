@@ -17,35 +17,26 @@ namespace VERSUS.Kentico.Services
 {
     internal class CacheManager : ICacheManager
     {
-        #region Constants
-
         private const string DUMMY_IDENTIFIER = "dummy";
 
-        #endregion Constants
-
-        #region Fields
-
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
+
         private readonly ConcurrentDictionary<string, object> _cacheDummyLocks = new ConcurrentDictionary<string, object>();
+
         private readonly object _entryCreationLock = new object();
+
         private readonly int _cacheExpirySeconds;
+
         private readonly bool _createCacheEntriesInBackground;
+
         private readonly IMemoryCache _memoryCache;
 
-        #endregion Fields
-
-        #region Constructors
-
-        public CacheManager(IOptionsSnapshot<VersusOptions> versusOptions, IMemoryCache memoryCache)
+        public CacheManager(IOptionsSnapshot<KenticoOptions> versusOptions, IMemoryCache memoryCache)
         {
             _cacheExpirySeconds = versusOptions.Value.CacheTimeoutSeconds;
             _createCacheEntriesInBackground = versusOptions.Value.CreateCacheEntriesInBackground;
             _memoryCache = memoryCache;
         }
-
-        #endregion Constructors
-
-        #region Public methods
 
         /// <summary>
         /// Gets an existing cache entry or creates one using the supplied <paramref name="valueFactory"/>.
@@ -141,10 +132,6 @@ namespace VERSUS.Kentico.Services
             return null;
         }
 
-        #endregion Public methods
-
-        #region Private methods
-
         /// <summary>
         /// Creates a new cache entry.
         /// </summary>
@@ -220,7 +207,5 @@ namespace VERSUS.Kentico.Services
         {
             return _memoryCache.TryGetValue(dummyKey, out dummyEntry) && !dummyEntry.IsCancellationRequested;
         }
-
-        #endregion Private methods
     }
 }

@@ -1,7 +1,14 @@
-﻿// React server-side rendering
-require('expose-loader?React!react');
-require('expose-loader?ReactDOM!react-dom');
-require('expose-loader?ReactDOMServer!react-dom/server');
+﻿import React from 'react';
+import ReactDOM from 'react-dom';
+import ReactDOMServer from 'react-dom/server';
 
-require('expose-loader?Components!./SiteTest.jsx');
+import SiteTest from './SiteTest.jsx';
+
+global.React = React;
+global.ReactDOM = ReactDOM;
+global.ReactDOMServer = ReactDOMServer;
+
+// React server-side rendering
+global.SiteTest = SiteTest;
+
 require('expose-loader?ProductScrollSection!./ProductScrollSection.js');

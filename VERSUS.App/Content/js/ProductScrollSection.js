@@ -13,6 +13,8 @@ function CreateShuffleInstance() {
 
     const shuffleInstance = new Shuffle(scrollSection, {
         itemSelector: itemSelector,
-        sizer: sizer
+        sizer: sizer,
+        buffer: 20,
+        columnThreshold: 20
     })
 }
