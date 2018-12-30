@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using React.AspNet;
 
 using VERSUS.Core;
+using VERSUS.Core.Extensions;
 using VERSUS.Infrastructure.Extensions;
 using VERSUS.Kentico.Extensions;
 using VERSUS.Kentico.Webhooks.Extensions;
@@ -42,22 +43,21 @@ namespace VERSUS.App
             Environment = env;
         }
 
-        // Add services to the container. This method is called by the runtime.
+        /// <summary>
+        /// Add services to the container. This method is called by the runtime.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.Configure<VersusOptions>(Configuration)
 
                     .AddDatabaseContext(Configuration, Environment)
 
-                    .Configure<CookiePolicyOptions>(Configuration)
-                    .PostConfigure<CookiePolicyOptions>(options =>
-                    {
-                        // This lambda determines whether user consent for non-essential cookies is needed for a given request
-                        options.CheckConsentNeeded = context => true;
-                    })
+                    .AddCookiePolicy(Configuration)
+                    .AddIdentity(Configuration)
 
                     .AddKenticoDelivery(Configuration)
-
                     .AddKenticoWebhooks();
 
             services.AddHttpContextAccessor()
@@ -70,12 +70,14 @@ namespace VERSUS.App
             return services.BuildServiceProvider();
         }
 
-        // Configure the HTTP request pipeline. The order of these methods matters. This method is called by the runtime.
-        public void Configure(IApplicationBuilder app, IOptionsSnapshot<VersusOptions> options)
+        /// <summary>
+        /// Configure the HTTP request pipeline. The order of these methods matters. This method is called by the runtime.
+        /// </summary>
+        public void Configure(IApplicationBuilder app, IOptionsSnapshot<VersusOptions> versusOptions, IOptionsSnapshot<KenticoOptions> kenticoOptions)
         {
             app.UseHttpsRedirection()
-                .UseWebhookMiddleware(options.Value.KenticoCloudWebhookEndpoint)
-                .UseStatusCodePagesWithReExecute($"{options.Value.ErrorHandlingRoute}/{{0}}")
+                .UseWebhookMiddleware(kenticoOptions.Value.KenticoCloudWebhookEndpoint)
+                .UseStatusCodePagesWithReExecute($"{versusOptions.Value.ErrorHandlingRoute}/{{0}}")
                 .UseSignalR();
 
             if (Environment.IsDevelopment())
@@ -84,10 +86,11 @@ namespace VERSUS.App
             }
             else
             {
-                app.UseExceptionHandler(options.Value.ErrorHandlingRoute)
+                app.UseExceptionHandler(versusOptions.Value.ErrorHandlingRoute)
                    .UseHsts();
             }
 
+            app.UseAuthentication();
             //app.UseMiddleware<ExceptionClearResponseMiddleware>();
 
             // Initialize ReactJS.NET. Must be before static files.

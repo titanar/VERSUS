@@ -15,7 +15,7 @@ namespace VERSUS.Kentico.Extensions
     {
         public static IServiceCollection AddKenticoDelivery(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<DeliveryOptions>(configuration)
+            services.Configure<KenticoOptions>(configuration.GetSection("KenticoOptions"))
 
                     .AddSingleton<ICacheManager, CacheManager>()
                     .AddTransient<IDependencyResolver, DependencyResolver>()
@@ -27,7 +27,7 @@ namespace VERSUS.Kentico.Extensions
                     .AddScoped<IDeliveryClient>(sp => new CachedDeliveryClient(
                          sp.GetRequiredService<ICacheManager>(),
                          DeliveryClientBuilder
-                             .WithOptions(_ => sp.GetRequiredService<IOptionsSnapshot<DeliveryOptions>>().Value)
+                             .WithOptions(_ => sp.GetRequiredService<IOptionsSnapshot<KenticoOptions>>().Value)
                              .WithCodeFirstTypeProvider(sp.GetRequiredService<ICodeFirstTypeProvider>())
                              .WithContentLinkUrlResolver(sp.GetRequiredService<IContentLinkUrlResolver>())
                              .Build(),
@@ -35,26 +35,25 @@ namespace VERSUS.Kentico.Extensions
                          sp.GetRequiredService<IDependencyResolver>()
                      ));
 
-            var sericeProvider = services.BuildServiceProvider();
-            var versusOptions = sericeProvider.GetRequiredService<IOptionsSnapshot<VersusOptions>>().Value;
+            var kenticoOptions = services.BuildServiceProvider().GetRequiredService<IOptionsSnapshot<KenticoOptions>>().Value;
 
-            HtmlHelperExtensions.ResponsiveImagesEnabled = versusOptions.ResponsiveImagesEnabled;
-            HtmlHelperExtensions.ResponsiveWidths = versusOptions.ResponsiveWidths;
+            HtmlHelperExtensions.ResponsiveImagesEnabled = kenticoOptions.ResponsiveImagesEnabled;
+            HtmlHelperExtensions.ResponsiveWidths = kenticoOptions.ResponsiveWidths;
 
             return services;
         }
 
         private static IDeliveryClient CreatePreviewDeliveryClientOrNull(IServiceProvider sp)
         {
-            var deliveryOptions = sp.GetRequiredService<IOptionsSnapshot<DeliveryOptions>>().Value;
+            var kenticoOptions = sp.GetRequiredService<IOptionsSnapshot<KenticoOptions>>().Value;
 
-            if (!string.IsNullOrEmpty(deliveryOptions.PreviewApiKey))
+            if (!string.IsNullOrEmpty(kenticoOptions.PreviewApiKey))
             {
-                deliveryOptions.UsePreviewApi = true;
-                deliveryOptions.UseSecuredProductionApi = false;
+                kenticoOptions.UsePreviewApi = true;
+                kenticoOptions.UseSecuredProductionApi = false;
 
                 return DeliveryClientBuilder
-                    .WithOptions(_ => deliveryOptions)
+                    .WithOptions(_ => kenticoOptions)
                     .WithCodeFirstTypeProvider(sp.GetRequiredService<ICodeFirstTypeProvider>())
                     .WithContentLinkUrlResolver(sp.GetRequiredService<IContentLinkUrlResolver>())
                     .Build();

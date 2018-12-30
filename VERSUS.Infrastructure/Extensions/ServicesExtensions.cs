@@ -1,6 +1,6 @@
-﻿using System;
-
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 using VERSUS.Core;
+using VERSUS.Infrastructure.Models;
 using VERSUS.Infrastructure.Services;
 
 namespace VERSUS.Infrastructure.Extensions
@@ -18,7 +19,7 @@ namespace VERSUS.Infrastructure.Extensions
         {
             var versusOptions = services.BuildServiceProvider().GetRequiredService<IOptionsSnapshot<VersusOptions>>().Value;
 
-            ObservableExtensions.DefaultTimeout = TimeSpan.FromSeconds(versusOptions.CommandTimeout);
+            ObservableExtensions.DefaultTimeout = versusOptions.CommandTimeout;
 
             services.AddDbContextPool<SiteDbContext>(
                 options => options
@@ -32,7 +33,7 @@ namespace VERSUS.Infrastructure.Extensions
                                     .MigrationsAssembly("VERSUS.Infrastructure")
 
                                     //Set command timeout
-                                    .CommandTimeout(versusOptions.CommandTimeout))
+                                    .CommandTimeout(versusOptions.CommandTimeout.Seconds))
 
                             // Throw an exception if there is an issue converting LINQ to database calls
                             .ConfigureWarnings(x => x.Throw(RelationalEventId.QueryClientEvaluationWarning))
@@ -46,6 +47,27 @@ namespace VERSUS.Infrastructure.Extensions
                      .AddScoped<IReviewService, ReviewService>()
 
                      .AddSignalR();
+
+            return services;
+        }
+
+        public static IServiceCollection AddIdentity(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddIdentityCore<SiteUser>()
+                .AddRoles<SiteRole>()
+                .AddEntityFrameworkStores<SiteDbContext>()
+                .AddSignInManager()
+                .AddDefaultTokenProviders();
+
+            services.Configure<IdentityOptions>(configuration.GetSection("IdentityOptions"));
+            services.Configure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme, configuration.GetSection("CookieAuthenticationOptions"));
+
+            services.AddAuthentication(o =>
+            {
+                o.DefaultScheme = IdentityConstants.ApplicationScheme;
+                o.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+            })
+            .AddIdentityCookies(o => { });
 
             return services;
         }

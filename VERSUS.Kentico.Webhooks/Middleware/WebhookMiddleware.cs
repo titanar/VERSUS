@@ -22,7 +22,7 @@ namespace VERSUS.Kentico.Webhooks.Middleware
         private readonly string _secret;
         private readonly IWebhookListener<WebhookSubjectModel> _webhookListener;
 
-        public WebhookMiddleware(IOptionsSnapshot<VersusOptions> versusOptions, IWebhookListener<WebhookSubjectModel> webhookListener)
+        public WebhookMiddleware(IOptionsSnapshot<KenticoOptions> versusOptions, IWebhookListener<WebhookSubjectModel> webhookListener)
         {
             _secret = versusOptions.Value.KenticoCloudWebhookSecret;
             _webhookListener = webhookListener;
