@@ -1,11 +1,14 @@
-﻿namespace VERSUS.App.Models
+﻿using VERSUS.Kentico.Types;
+
+namespace VERSUS.App.Models
 {
-    public class CookieConsentViewModel
+    public class CookieConsentViewModel : AnnouncementViewModel
     {
-        public bool Show { get; set; }
+        public string CookieString { get; }
 
-        public string Header { get; set; }
-
-        public string CookieString { get; set; }
+        public CookieConsentViewModel(Announcement announcement, string cookieString) : base(announcement)
+        {
+            CookieString = cookieString;
+        }
     }
 }

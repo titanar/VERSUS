@@ -1,25 +1,33 @@
-﻿using VERSUS.Kentico.Types;
+﻿using System.Linq;
+using KenticoCloud.Delivery;
+using VERSUS.Kentico.Extensions;
+using VERSUS.Kentico.Types;
 
 namespace VERSUS.App.Models
 {
     public class AnnouncementViewModel
     {
-        public string Title => "Did you know";
+        public string Title { get; }
 
-        public string Announcement { get; set; }
+        public IRichTextContent Body { get; }
 
-        public AnnouncementLevelEnum Level => AnnouncementLevelEnum.Info;
+        public AnnouncementLevelEnum Level { get; } = AnnouncementLevelEnum.Info;
 
-        public AnnouncementViewModel(Site site, AnnouncementTypeEnum announcementType)
+        public AnnouncementLocationEnum Location { get; } = AnnouncementLocationEnum.Top;
+
+        public AnnouncementViewModel(Announcement announcement)
         {
-            switch (announcementType)
-            {
-                case AnnouncementTypeEnum.Top:
-                    Announcement = site.Announcement;
-                    break;
+            Title = announcement.Title;
+            Body = announcement.Body;
 
-                case AnnouncementTypeEnum.Bottom:
-                    break;
+            if (announcement.Level.FirstOrDefault() is MultipleChoiceOption announcementLevel)
+            {
+                Level = announcementLevel.ToEnum<AnnouncementLevelEnum>();
+            }
+
+            if (announcement.Location.FirstOrDefault() is MultipleChoiceOption announcementLocation)
+            {
+                Location = announcementLocation.ToEnum<AnnouncementLocationEnum>();
             }
         }
     }

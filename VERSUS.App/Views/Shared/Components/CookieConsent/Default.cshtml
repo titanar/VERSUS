@@ -1,16 +1,21 @@
 ﻿@model CookieConsentViewModel
+@if (!string.IsNullOrEmpty(Model.CookieString))
+{
+    var level = Model.Level.ToString().ToLower();
+    var type = Model.Location.ToString().ToLower();
 
-<div id="cookieConsent" class="row announcement alert alert-info alert-dismissible">
-    <span class="h4">@Model.Header</span>
-    <a asp-controller="Home" asp-action="Privacy" class="btn btn-info navbar-btn">Learn More</a>
-    <button type="button" class="btn btn-default navbar-btn" data-cookie-string="@Model.CookieString">Accept</button>
-</div>
+    <div class="row announcement-@type alert-@level">
+        <span class="h4 colon-after">@Model.Title</span>
+        <span class="h5 rich-text">@Html.DisplayFor(m => Model.Body)</span>
+        <button type="button" class="button-accept">Accept</button>
+    </div>
 
-<script>
-    (function () {
-        document.querySelector("#cookieConsent button[data-cookie-string]").addEventListener("click", function (el) {
-            document.cookie = el.target.dataset.cookieString;
-            document.querySelector("#cookieConsent").classList.add("hidden");
-        }, false);
-    })();
-</script>
+    <script>
+        (function () {
+            document.querySelector("#cookieConsent button[data-cookie-string]").addEventListener("click", function (el) {
+                document.cookie = el.target.dataset.cookieString;
+                document.querySelector("#cookieConsent").classList.add("hidden");
+            }, false);
+        })();
+    </script>
+}

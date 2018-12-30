@@ -1,10 +1,16 @@
-﻿@model AnnouncementViewModel
+﻿@model IEnumerable<AnnouncementViewModel>
 
-@if (!string.IsNullOrEmpty(Model.Announcement))
+@if (Model.Any())
 {
-    <div class="row announcement alert alert-@Model.Level.ToString().ToLower() alert-dismissible">
-        <span class="h4 font-weight-bold colon-after">@Model.Title</span>
-        <span class="h4">@Model.Announcement</span>
-        <button type="button" class="btn btn-default navbar-btn">X</button>
-    </div>
+    foreach (var announcement in Model)
+    {
+        var level = announcement.Level.ToString().ToLower();
+        var type = announcement.Location.ToString().ToLower();
+
+        <div class="row announcement-@type alert-@level">
+            <span class="h4 colon-after">@announcement.Title</span>
+            <span class="h5 rich-text">@Html.DisplayFor(_ => announcement.Body)</span>
+            <button type="button" class="button-close">X</button>
+        </div>
+    }
 }
