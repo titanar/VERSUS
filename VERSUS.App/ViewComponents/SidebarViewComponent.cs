@@ -1,4 +1,5 @@
-﻿using System.Reactive.Linq;
+﻿using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 
 using KenticoCloud.Delivery;
@@ -10,9 +11,9 @@ using VERSUS.Kentico.Types;
 
 namespace VERSUS.App.ViewComponents
 {
-    public class Sidebar : SharedViewComponent
+    public class SidebarViewComponent : SharedViewComponent
     {
-        public Sidebar(IDeliveryClient deliveryClient) : base(deliveryClient)
+        public SidebarViewComponent(IDeliveryClient deliveryClient) : base(deliveryClient)
         {
         }
 
@@ -20,7 +21,9 @@ namespace VERSUS.App.ViewComponents
         {
             var viewModel = await DeliveryObservable
                 .GetItemObservable<Site>("site")
-                .Select(s => new SidebarViewModel(s));
+                .Select(s => s.Sidebar.Cast<SidebarItem>())
+                .Select(sidebarItems => sidebarItems
+                                            .Select(i => new SidebarItemViewModel(i)));
 
             return View(viewModel);
         }

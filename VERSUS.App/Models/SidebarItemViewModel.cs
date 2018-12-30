@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 
 using KenticoCloud.Delivery;
-
+using VERSUS.Kentico.Extensions;
 using VERSUS.Kentico.Types;
 
 namespace VERSUS.App.Models
@@ -10,23 +10,21 @@ namespace VERSUS.App.Models
     {
         public readonly Asset Icon;
 
-        public string Title { get; private set; }
+        public string Title { get; }
 
-        public SidebarItemViewModel(string title)
-        {
-            Title = title;
-        }
+        public SidebarItemLocationEnum SidebarItemLocation { get; } = SidebarItemLocationEnum.Top;
 
-        public SidebarItemViewModel(object sidebarItem)
+        public SidebarItemTypeEnum SidebarItemType { get; } = SidebarItemTypeEnum.Link;
+
+        public SidebarItemViewModel(SidebarItem sidebarItem)
         {
-            if (sidebarItem.GetType() == typeof(SiteSection) && sidebarItem is SiteSection sectionItem)
+            Icon = sidebarItem.Icon.FirstOrDefault();
+            Title = sidebarItem.Title;
+            SidebarItemLocation = sidebarItem.Location.FirstOrDefault().ToEnum<SidebarItemLocationEnum>();
+
+            if (sidebarItem.Type.FirstOrDefault() is MultipleChoiceOption sidebarItemType)
             {
-                Icon = sectionItem.Icon.First();
-                Title = sectionItem.Title;
-            }
-            else if (sidebarItem.GetType() == typeof(SiteLogo) && sidebarItem is SiteLogo logoItem)
-            {
-                Icon = logoItem.Logo.First();
+                SidebarItemType = sidebarItemType.ToEnum<SidebarItemTypeEnum>();
             }
         }
     }

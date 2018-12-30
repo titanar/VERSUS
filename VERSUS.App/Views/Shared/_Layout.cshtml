@@ -14,26 +14,26 @@
 </head>
 <body>
 
-    <div class="container-fluid d-flex flex-column body-content">
+    <div id="body-content">
 
         @* Primary announcements row *@
-        <div class="row announcements-primary">
-            <div class="col">
-                @(await Component.InvokeAsync<Announcement>(AnnouncementTypeEnum.Top))
-                @(await Component.InvokeAsync<CookieConsent>())
+        <div id="announcements-primary" class="row">
+            <div class="column">
+                @(await Component.InvokeAsync<AnnouncementViewComponent>(AnnouncementLocationEnum.Top))
+                @(await Component.InvokeAsync<CookieConsentViewComponent>())
             </div>
         </div>
 
         @* Main content row *@
-        <div class="row main-content">
-            @(await Component.InvokeAsync<Sidebar>())
+        <div id="main-content" class="row">
+            @(await Component.InvokeAsync<SidebarViewComponent>())
             @RenderBody()
         </div>
 
         @* Secondary announcements row *@
-        <div class="row announcements-secondary">
-            <div class="col">
-                @(await Component.InvokeAsync<Announcement>(AnnouncementTypeEnum.Bottom))
+        <div id="announcements-secondary" class="row">
+            <div class="column">
+                @(await Component.InvokeAsync<AnnouncementViewComponent>(AnnouncementLocationEnum.Bottom))
             </div>
         </div>
     </div>
@@ -46,6 +46,7 @@
     <environment exclude="Development">
         <script src="~/js/versus.min.js" asp-append-version="true"></script>
     </environment>
+
     @RenderSection("Scripts", required: false)
     @Html.ReactInitJavaScript()
 </body>

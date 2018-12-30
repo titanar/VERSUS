@@ -1,11 +1,27 @@
-﻿@model SidebarViewModel
+﻿@model IEnumerable<SidebarItemViewModel>
 @{
-    var logo = new SidebarItemViewModel("Logo");
-    var search = new SidebarItemViewModel("Search");
+    List<SidebarItemViewModel> topItems = new List<SidebarItemViewModel>();
+    SidebarItemViewModel spacer = null;
+    List<SidebarItemViewModel> bottomItems = new List<SidebarItemViewModel>();
 
+    foreach (var item in Model)
+    {
+        switch (item.SidebarItemLocation)
+        {
+            case SidebarItemLocationEnum.Top:
+                topItems.Add(item);
+                continue;
+            case SidebarItemLocationEnum.Spacer:
+                spacer = item;
+                continue;
+            case SidebarItemLocationEnum.Bottom:
+                bottomItems.Add(item);
+                continue;
+        }
+    }
 }
-<div class="col navigation">
-    @Html.DisplayFor(m => logo)
-    @Html.DisplayFor(m => search)
-    @Html.DisplayFor(m => m.Sidebar)
+<div id="sidebar" class="column">
+    @Html.DisplayFor(_ => topItems)
+    @Html.DisplayFor(_ => spacer)
+    @Html.DisplayFor(_ => bottomItems)
 </div>

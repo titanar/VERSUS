@@ -1,6 +1,15 @@
 ﻿@model SidebarItemViewModel
-
-<div class="row">
-    <img src=" @Model.Icon?.Url" asp-append-version="true" />
-    <a class="col navigation-item" href="/@Model.Title">@Model.Title</a>
+@{
+    var location = @Model.SidebarItemLocation.ToString().ToLower();
+}
+<div class="row sidebar-item-@location">
+    @if (Model.SidebarItemLocation != SidebarItemLocationEnum.Spacer)
+    {
+        <a class="column sidebar-item-link" href="/@Model.Title" title="@Model.Title">
+            @if (Model.Icon is Asset icon)
+            {
+                <img src=" @icon.Url" asp-append-version="true" />
+            }
+        </a>
+    }
 </div>

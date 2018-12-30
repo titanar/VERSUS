@@ -10,14 +10,20 @@ using KenticoCloud.Delivery;
 
 namespace VERSUS.Kentico.Types
 {
-    public partial class SiteSection
+    public partial class SidebarItem
     {
-        public const string Codename = "site_section";
-        public const string DescriptionCodename = "description";
+        public const string Codename = "sidebar_item";
+        public const string LocationCodename = "location";
+        public const string TypeCodename = "type";
+        public const string IconCodename = "icon";
         public const string TitleCodename = "title";
+        public const string DestinationCodename = "destination";
 
-        public IRichTextContent Description { get; set; }
+        public IEnumerable<MultipleChoiceOption> Location { get; set; }
+        public IEnumerable<MultipleChoiceOption> Type { get; set; }
+        public IEnumerable<Asset> Icon { get; set; }
         public string Title { get; set; }
+        public IEnumerable<object> Destination { get; set; }
         public ContentItemSystemAttributes System { get; set; }
     }
 }
