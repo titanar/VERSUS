@@ -15,6 +15,8 @@ namespace VERSUS.App.Models
 
         public AnnouncementLocationEnum Location { get; } = AnnouncementLocationEnum.Top;
 
+        public AnnouncementTypeEnum Type { get; } = AnnouncementTypeEnum.Close;
+
         public AnnouncementViewModel(Announcement announcement)
         {
             Title = announcement.Title;
@@ -28,6 +30,11 @@ namespace VERSUS.App.Models
             if (announcement.Location.FirstOrDefault() is MultipleChoiceOption announcementLocation)
             {
                 Location = announcementLocation.ToEnum<AnnouncementLocationEnum>();
+            }
+
+            if (announcement.Type.FirstOrDefault() is MultipleChoiceOption announcementType)
+            {
+                Type = announcementType.ToEnum<AnnouncementTypeEnum>();
             }
         }
     }

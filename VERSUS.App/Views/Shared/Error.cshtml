@@ -2,13 +2,18 @@
 @{
     ViewData["Title"] = "Error";
 }
-
-<h1 class="text-danger">Something happened: @if (Model.ErrorCode > 0) { @Model.ErrorCode }</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
-
-@if (Model.ShowRequestId)
-{
-    <p>
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
-    </p>
-}
+<div id="errorSection">
+    <h1 class="text-danger">
+        Something happened: @if (Model.ErrorCode > 0)
+        {@Model.ErrorCode}
+    </h1>
+    <br />
+    <h2 class="text-danger">An error occurred while processing your request.</h2>
+    <br />
+    @if (Model.ShowRequestId)
+    {
+        <p>
+            <strong>Request ID:</strong> <code>@Model.RequestId</code>
+        </p>
+    }
+</div>

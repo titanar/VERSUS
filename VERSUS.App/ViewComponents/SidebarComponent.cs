@@ -4,20 +4,20 @@ using System.Threading.Tasks;
 
 using KenticoCloud.Delivery;
 
-using Microsoft.AspNetCore.Mvc;
-
 using VERSUS.App.Models;
 using VERSUS.Kentico.Types;
 
+using IHtmlContent = Microsoft.AspNetCore.Html.IHtmlContent;
+
 namespace VERSUS.App.ViewComponents
 {
-    public class SidebarViewComponent : SharedViewComponent
+    public class SidebarComponent : SharedViewComponent
     {
-        public SidebarViewComponent(IDeliveryClient deliveryClient) : base(deliveryClient)
+        public SidebarComponent(IDeliveryClient deliveryClient) : base(deliveryClient)
         {
         }
 
-        public async Task<IViewComponentResult> InvokeAsync()
+        public async Task<IHtmlContent> InvokeAsync()
         {
             var viewModel = await DeliveryObservable
                 .GetItemObservable<Site>("site")
@@ -25,7 +25,7 @@ namespace VERSUS.App.ViewComponents
                 .Select(sidebarItems => sidebarItems
                                             .Select(i => new SidebarItemViewModel(i)));
 
-            return View(viewModel);
+            return RenderReactComponent(new { model = viewModel }, containerId: "sidebar");
         }
     }
 }

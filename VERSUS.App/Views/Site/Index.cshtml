@@ -6,27 +6,23 @@
 }
 
 @* Endless scroll container *@
-<div class="column product-scroll-section-wrapper">
-    <div id="product-scroll-section" class="product-scroll-section">
+<div id="productSection">
 
-        @for (int i = 0; i < 20; i++)
-        {
-            var width = random.Next(i) % 3 == 0 ? 2 : 4;
-            var height = random.Next(i) % 5 == 0 ? 2 : 4;
+    @for (int i = 0; i < 20; i++)
+    {
+        var width = $"width{(random.Next(i) % 3 == 0 ? 2 : 4).ToString()}";
+        var height = $"height{(random.Next(i) % 5 == 0 ? 2 : 4).ToString()}";
+        var background = Html.Raw(String.Format("#{0:X6}", random.Next(0x1000000)));
 
-            @* Product item *@
-            <div class="product-box width-@width height-@height" data-groups='["shirt"]'>
-                <div class="product-details" style="background:@Html.Raw(String.Format("#{0:X6}", random.Next(0x1000000)));">
-                    <h2>VERSUS Shirt @i</h2>
-                    <h4 class="product-price">$23.50</h4>
-                    <p class="text-overflow">This is an exciting shirt that you want to buy.</p>
-                </div>
+        @* Product item *@
+        <div class="productBox @width @height" data-groups='["shirt"]'>
+            <div class="productDetails" style="background:@background">
+                <h2 class="productName">VERSUS Shirt @i</h2>
+                <h4 class="productPrice">$23.50</h4>
+                <p class="productText">This is an exciting shirt that you want to buy.</p>
             </div>
-        }
+        </div>
+    }
 
-        <div class="col-1 product-scroll-sizer"></div>
-    </div>
+    <div id="productSectionScrollSizer" class="width2"></div>
 </div>
-
-@section Scripts {
-}

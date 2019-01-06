@@ -101,7 +101,9 @@ namespace VERSUS.App
                         .SetReuseJavaScriptEngines(true)
                         .SetLoadBabel(false)
                         .SetLoadReact(false)
-                        .AddScriptWithoutTransform("/js/versus.js");
+                        .AddScriptWithoutTransform("/components/versus.js");
+
+                    config.JsonSerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter(true));
                 })
 
                 .UseStaticFiles()

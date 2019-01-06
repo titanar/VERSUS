@@ -1,7 +1,224 @@
-﻿body {
+﻿*, *::before, *::after {
+    box-sizing: border-box;
+}
 
+.row {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    position: relative;
+}
+
+.column {
+    flex: 1;
+    flex-direction: column;
+    display: flex;
+    position: relative;
+}
+
+.collapsible {
+    overflow: hidden;
 }
 
 .hidden {
     display: none;
+}
+
+.colonAfter::after {
+    content: ": ";
+    white-space: pre;
+}
+
+span {
+    padding: 0.375rem 0;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    font-family: inherit;
+    color: inherit;
+
+    &.richText {
+        p {
+            display: inline-block;
+            margin: 0;
+        }
+
+        a {
+            border-bottom: 3px solid #820101;
+            color: #820101;
+            text-decoration: none;
+
+            &:visited {
+                border-bottom: 3px solid #544a4a;
+                color: #544a4a;
+            }
+        }
+    }
+
+    &.h5 {
+        font-weight: 500;
+    }
+
+    &.h4 {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        font-family: inherit;
+        line-height: 1.2;
+        color: inherit;
+    }
+}
+
+button {
+    display: inline-block;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.2;
+    box-sizing: border-box;
+    border-radius: 0.25rem;
+    margin: 0 .5rem .5rem;
+    font-family: inherit;
+
+    &.close {
+    }
+
+    &.accept {
+    }
+
+    &:hover {
+        background-color: #138496;
+        border-color: #117a8b;
+        color: #fff;
+    }
+
+    &:not(:disabled) {
+        cursor: pointer;
+    }
+}
+
+html {
+    height: 100%;
+
+    body {
+        background: lightgrey;
+        height: 100%;
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+
+        #bodyContent {
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+
+            #announcementsPrimary, #announcementsSecondary {
+                flex: none;
+
+                .announcement {
+                    padding: .5rem .5rem 0;
+
+                    &.info {
+                        color: #0c5460;
+                        background-color: #d1ecf1;
+                        border-color: #bee5eb;
+                    }
+                }
+            }
+
+            #mainContent {
+                flex: 1;
+
+                #sidebar {
+                    background: lightskyblue;
+                    display: flex;
+                    flex-direction: column;
+                    flex: 1;
+
+                    .top, .bottom {
+                        flex: none;
+                    }
+
+                    .link {
+                        img {
+                            width: 100%;
+                            display: block;
+                        }
+                    }
+                }
+
+                #scrollSection {
+                    overflow-y: scroll;
+                    padding: 0;
+                    flex: 30;
+                }
+
+                #productSection {
+                    position: relative;
+                    padding: .5rem;
+                    width: 100%;
+
+                    .width2 {
+                        width: 20%;
+                    }
+
+                    .width4 {
+                        width: 40%;
+                    }
+
+                    .height2 {
+                        height: 20rem;
+                    }
+
+                    .height4 {
+                        height: 40rem;
+                    }
+
+                    .productBox {
+                        float: left;
+                        margin: 0;
+                        padding: .5rem;
+                        display: flex;
+
+                        .productDetails {
+                            flex: 1;
+                            padding: 1rem;
+
+                            .productName {
+                                margin: 0 0 .5rem;
+                            }
+
+                            .productPrice {
+                                margin: 0 0 .5rem;
+                            }
+
+                            .productText {
+                                margin: 0 0 .5rem;
+                            }
+                        }
+                    }
+
+                    .productImage {
+                        width: 100%;
+                        height: 100%;
+
+                        .fakeImage {
+                            width: 200px;
+                            height: 200px;
+                            background: pink;
+                        }
+                    }
+                }
+
+                #errorSection {
+                }
+            }
+        }
+    }
 }

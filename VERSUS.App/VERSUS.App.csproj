@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <LangVersion>7.3</LangVersion>
+    <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,5 +35,4 @@
     <ProjectReference Include="..\VERSUS.Kentico.Webhooks\VERSUS.Kentico.Webhooks.csproj" />
     <ProjectReference Include="..\VERSUS.Kentico\VERSUS.Kentico.csproj" />
   </ItemGroup>
-
 </Project>

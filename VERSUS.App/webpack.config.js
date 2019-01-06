@@ -7,9 +7,9 @@ var usedevtool = process.env.NODE_ENV == 'production' ? false : 'cheap-module-ev
 module.exports = {
     mode: process.env.NODE_ENV,
     devtool: usedevtool,
-    entry: './Content/js/index.js',
+    entry: './loadReactComponents.js',
     output: {
-        path: path.resolve(__dirname, 'wwwroot/js'),
+        path: path.resolve(__dirname, 'wwwroot/components'),
         filename: 'versus' + extension + '.js'
     },
     module: {

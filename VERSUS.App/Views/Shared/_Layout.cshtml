@@ -14,26 +14,28 @@
 </head>
 <body>
 
-    <div id="body-content">
+    <div id="bodyContent">
 
         @* Primary announcements row *@
-        <div id="announcements-primary" class="row">
+        <div id="announcementsPrimary" class="row">
             <div class="column">
-                @(await Component.InvokeAsync<AnnouncementViewComponent>(AnnouncementLocationEnum.Top))
-                @(await Component.InvokeAsync<CookieConsentViewComponent>())
+                @(await Component.InvokeAsync<AnnouncementComponent>(AnnouncementLocationEnum.Top))
+                @(await Component.InvokeAsync<CookieConsentComponent>())
             </div>
         </div>
 
         @* Main content row *@
-        <div id="main-content" class="row">
-            @(await Component.InvokeAsync<SidebarViewComponent>())
-            @RenderBody()
+        <div id="mainContent" class="row">
+            @(await Component.InvokeAsync<SidebarComponent>())
+            <div class="column" id="scrollSection">
+                @RenderBody()
+            </div>
         </div>
 
         @* Secondary announcements row *@
-        <div id="announcements-secondary" class="row">
+        <div id="announcementsSecondary" class="row">
             <div class="column">
-                @(await Component.InvokeAsync<AnnouncementViewComponent>(AnnouncementLocationEnum.Bottom))
+                @(await Component.InvokeAsync<AnnouncementComponent>(AnnouncementLocationEnum.Bottom))
             </div>
         </div>
     </div>
@@ -41,10 +43,10 @@
     @* Leave these scripts at the end to not block the response *@
     <environment include="Development">
         @* versus.js already includes all libraries *@
-        <script src="~/js/versus.js" asp-append-version="true"></script>
+        <script src="~/components/versus.js" asp-append-version="true"></script>
     </environment>
     <environment exclude="Development">
-        <script src="~/js/versus.min.js" asp-append-version="true"></script>
+        <script src="~/components/versus.min.js" asp-append-version="true"></script>
     </environment>
 
     @RenderSection("Scripts", required: false)

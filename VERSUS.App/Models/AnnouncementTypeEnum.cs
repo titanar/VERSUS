@@ -1,9 +1,8 @@
 ﻿namespace VERSUS.App.Models
 {
-    public enum AnnouncementLocationEnum
+    public enum AnnouncementTypeEnum
     {
-        Top,
-        Bottom,
-        Popup
+        Close,
+        Accept
     }
 }
