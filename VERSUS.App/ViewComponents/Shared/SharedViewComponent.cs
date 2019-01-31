@@ -28,7 +28,7 @@ namespace VERSUS.App.ViewComponents
             string htmlTag = null,
             string containerId = null,
             string containerClass = null,
-            bool clientOnly = false,
+            bool clientOnly = true,
             Action<Exception, string, string> exceptionHandler = null
         )
         {

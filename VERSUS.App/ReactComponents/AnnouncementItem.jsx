@@ -31,9 +31,9 @@ export default class AnnouncementItem extends Component {
             this.props.closeAction();
         }
 
-        this.setState(() => ({
+        this.setState({
             closed: true
-        }))
+        })
     }
 
     render() {

@@ -5,11 +5,9 @@ export default class AnnouncementComponent extends Component {
     render() {
         return (
             <div>
-                {this.props.model.map(function (m, i) {
-                    return (
-                        <AnnouncementItem model={m} key={i} />
-                    );
-                })}
+                {this.props.model.map((m, i) => 
+                    <AnnouncementItem model={m} key={i} />
+                )}
             </div>
         );
     }

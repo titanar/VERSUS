@@ -21,9 +21,7 @@ namespace VERSUS.App.ViewComponents
         {
             var viewModel = await DeliveryObservable
                 .GetItemObservable<Site>("site")
-                .Select(s => s.Sidebar.Cast<SidebarItem>())
-                .Select(sidebarItems => sidebarItems
-                                            .Select(i => new SidebarItemViewModel(i)));
+                .Select(s => s.Sidebar.Cast<SidebarItem>().Select(i => new SidebarItemViewModel(i)));
 
             return RenderReactComponent(new { model = viewModel }, containerId: "sidebar");
         }

@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
+using Newtonsoft.Json.Converters;
+
 using React.AspNet;
 
 using VERSUS.Core;
@@ -65,7 +67,11 @@ namespace VERSUS.App
                     .AddJsEngineSwitcher(options => options.DefaultEngineName = ChakraCoreJsEngine.EngineName)
                     .AddChakraCore();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest);
+            services.AddMvc()
+                    .SetCompatibilityVersion(CompatibilityVersion.Latest)
+                    .AddJsonOptions(options =>
+                        options.SerializerSettings.Converters.Add(new StringEnumConverter(true))
+                    );
 
             return services.BuildServiceProvider();
         }

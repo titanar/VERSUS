@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 
 using KenticoCloud.Delivery;
+
 using VERSUS.Kentico.Extensions;
 using VERSUS.Kentico.Types;
 

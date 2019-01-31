@@ -8,7 +8,7 @@ export default class CookieConsentComponent extends Component {
 
     render() {
         return (
-            <AnnouncementItem model={this.props.model} closeAction={this.saveCookie.bind(this)} />
+            <AnnouncementItem model={this.props.model} closeAction={() => this.saveCookie()} />
         );
     }
 }
