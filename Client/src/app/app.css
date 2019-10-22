@@ -1,0 +1,62 @@
+.error.boundary {
+  margin: 1em;
+}
+
+.error.boundary span {
+  white-space: pre;
+}
+
+#root,
+#root div[role='group'] {
+  height: 100%;
+}
+
+.app {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.sidebar {
+  box-shadow: 0 0 2em rgba(0, 0, 0, 0.5);
+  font-size: 1.5em;
+  padding: 0.5em 0;
+  z-index: 1000;
+}
+
+.sidebar a {
+  padding: 0.5em;
+}
+
+.main {
+  flex: 1 0 auto;
+}
+
+.main .home {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  padding: 0.5em;
+}
+
+.home .card {
+  margin: 1em !important;
+}
+
+.home .item {
+  background: rosybrown;
+  padding: 1em;
+  border: 1em solid white;
+  position: absolute;
+}
+
+.home .item pre {
+  margin: 0;
+}
+
+.sizer {
+  width: 10em;
+  height: 10em;
+  position: absolute;
+  left: -9999px;
+}

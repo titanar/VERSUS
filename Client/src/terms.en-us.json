@@ -1,0 +1,10 @@
+{
+  "home": {
+    "header": "VERSUS"
+  },
+  "errors": {
+    "genericError": "A generic error has occurred.",
+    "genericStack": "No error information.",
+    "notFound": "This path does not exist."
+  }
+}
