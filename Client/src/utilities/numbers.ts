@@ -1,6 +1,8 @@
 export const toRounded = (value: number, decimals: number = 0) =>
   Number(`${Math.round(Number(`${value}e${decimals}`))}e-${decimals}`);
 
+export const toBetween = (value: number, max: number, min: number) => Math.max(Math.min(value, max), min);
+
 export const getSizeText = (sizeInBytes: number | undefined, decimals: number = 0): [number, string] => {
   let unit = 'B';
 

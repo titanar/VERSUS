@@ -18,7 +18,7 @@ import {
 import { Snack } from './header/Snack';
 import { ISnack, showSnack } from './header/snacks';
 
-const Home = lazy(() => import('./Home').then(module => ({ default: module.Home })));
+const Home = lazy(() => import('./home/Home').then(module => ({ default: module.Home })));
 const Error = lazy(() => import('../shared/Error').then(module => ({ default: module.Error })));
 
 export const Frontend: RoutedFC = () => {

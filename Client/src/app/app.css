@@ -30,6 +30,8 @@
 
 .main {
   flex: 1 0 auto;
+  overflow-y: scroll;
+  position: relative;
 }
 
 .main .home {
